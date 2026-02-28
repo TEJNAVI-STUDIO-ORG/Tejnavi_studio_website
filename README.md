@@ -88,6 +88,25 @@ npm run build
 npm run preview
 ```
 
+## Screenshots
+
+Here are some screenshots of the Tejnavi Studio website:
+
+### Home Page
+![Home Page](./SCREENSHOTS/home.png)
+
+### Projects Page
+![Projects Page](./SCREENSHOTS/projects.png)
+
+### About Page
+![About Page](./SCREENSHOTS/about.png)
+
+### Contact Page
+![Contact Page](./SCREENSHOTS/contact.png)
+
+### Quotation Page
+![Quotation Page](./SCREENSHOTS/quotation.png)
+
 ## Notes
 
 - The global HTML metadata is in `client/index.html`.
