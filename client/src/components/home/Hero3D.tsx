@@ -1,19 +1,17 @@
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, MeshDistortMaterial, Sphere } from '@react-three/drei';
 import { motion } from 'framer-motion';
 
 function AnimatedSphere() {
   return (
-    <Sphere visible args={[1, 100, 200]} scale={2.2}>
-      <MeshDistortMaterial
+    <mesh position={[0, 0, 0]} scale={2.2}>
+      <sphereGeometry args={[1, 32, 32]} />
+      <meshPhongMaterial
         color="#222222"
-        attach="material"
-        distort={0.4}
-        speed={1.5}
-        roughness={0.4}
-        metalness={0.8}
+        wireframe={false}
+        emissive="#111111"
+        shininess={100}
       />
-    </Sphere>
+    </mesh>
   );
 }
 
@@ -27,7 +25,6 @@ export function Hero3D() {
           <directionalLight position={[2, 5, 2]} intensity={1.5} color="#F5F5F5" />
           <directionalLight position={[-2, -5, -2]} intensity={0.5} color="#1A1A1A" />
           <AnimatedSphere />
-          <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.8} />
         </Canvas>
       </div>
 

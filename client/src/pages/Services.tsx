@@ -4,27 +4,101 @@ import { Link } from "wouter";
 const SERVICES = [
   {
     id: "01",
-    title: "Web Application Development",
-    description: "High-performance, scalable web applications built with modern frameworks like React, Next.js, and Node.js. We focus on speed, security, and seamless user experiences.",
-    features: ["Custom Dashboards", "SaaS Platforms", "Progressive Web Apps", "E-commerce Solutions"]
+    slug: "website-development",
+    title: "Website Development",
+    description: "Modern websites from landing pages to multi-page experiences. Fast, responsive, and optimized for conversion.",
+    features: ["Landing Pages", "Corporate Sites", "Portfolio Sites", "Content-Managed Websites"]
   },
   {
     id: "02",
-    title: "Mobile App Development",
-    description: "Native and cross-platform mobile applications that live in the pockets of your users. Built with React Native or Flutter for iOS and Android.",
-    features: ["iOS & Android Apps", "UI/UX Design", "API Integration", "App Store Deployment"]
+    slug: "shopify-website",
+    title: "Shopify Website Development",
+    description: "E-commerce stores on Shopify. Custom themes, apps, and integrations to maximize sales and streamline operations.",
+    features: ["Custom Themes", "Payment & Shipping", "Product Management", "Analytics & Marketing"]
   },
   {
     id: "03",
-    title: "UI/UX Experience Design",
-    description: "We don't just make it look pretty; we engineer how it feels. Deep user research combined with premium aesthetic execution.",
-    features: ["User Research", "Wireframing", "Interactive Prototypes", "Design Systems"]
+    slug: "web-apps",
+    title: "Web Application Development",
+    description: "High-performance, scalable web applications built with React, Next.js, and Node.js. Speed, security, and seamless UX.",
+    features: ["Custom Dashboards", "Progressive Web Apps", "Real-time Features", "API-First Design"]
   },
   {
     id: "04",
+    slug: "saas-apps",
+    title: "SaaS App Development",
+    description: "Subscription-based software as a service. Multi-tenant architecture, billing, and scalable infrastructure.",
+    features: ["Subscription Billing", "Admin Panels", "User Management", "Analytics & Reporting"]
+  },
+  {
+    id: "05",
+    slug: "crm",
+    title: "Custom CRM Solutions",
+    description: "Tailored CRM systems for sales, marketing, and customer success. Pipelines, automation, and integrations.",
+    features: ["Sales Pipelines", "Contact & Deal Management", "Automation & Workflows", "Reporting & Dashboards"]
+  },
+  {
+    id: "06",
+    slug: "mobile-apps",
+    title: "Mobile App Development",
+    description: "Native and cross-platform mobile apps for iOS and Android. React Native and Flutter for fast, maintainable builds.",
+    features: ["iOS & Android", "API Integration", "Push Notifications", "App Store Deployment"]
+  },
+  {
+    id: "07",
+    slug: "desktop-apps",
+    title: "Desktop Application Development",
+    description: "Cross-platform desktop applications for Windows and macOS. Electron or native tooling for robust, installable apps.",
+    features: ["Windows & macOS", "Offline Support", "Auto-Updates", "System Integration"]
+  },
+  {
+    id: "08",
+    slug: "spotify-type-apps",
+    title: "Music & Streaming App Development",
+    description: "Music, podcast, and media streaming applications. Playback, discovery, and engagement features.",
+    features: ["Streaming Architecture", "Playlists & Discovery", "Offline Playback", "Social Features"]
+  },
+  {
+    id: "09",
+    slug: "ui-ux",
+    title: "UI/UX Experience Design",
+    description: "User research, wireframing, and premium visual design. We engineer how your product feels and performs.",
+    features: ["User Research", "Wireframing", "Interactive Prototypes", "Design Systems"]
+  },
+  {
+    id: "10",
+    slug: "automation-ai",
     title: "Intelligent Automation & AI",
-    description: "Transforming workflows by integrating AI models and automating repetitive tasks, reducing overhead and increasing efficiency.",
-    features: ["OpenAI Integration", "Workflow Automation", "Custom LLM Solutions", "Data Processing pipelines"]
+    description: "AI models and workflow automation to reduce overhead and increase efficiency.",
+    features: ["OpenAI Integration", "Workflow Automation", "Custom LLM Solutions", "Data Pipelines"]
+  },
+  {
+    id: "11",
+    slug: "brand-identity",
+    title: "Brand & Visual Identity",
+    description: "Cohesive brand systems across web, mobile, and print. Logo, guidelines, and design systems.",
+    features: ["Logo & Wordmark", "Brand Guidelines", "Design Systems", "Marketing Assets"]
+  },
+  {
+    id: "12",
+    slug: "devops-cloud",
+    title: "DevOps & Cloud Architecture",
+    description: "Reliable infrastructure so your product stays fast and available. AWS, GCP, Azure, and CI/CD.",
+    features: ["Cloud Architecture", "CI/CD Pipelines", "Monitoring", "Performance Optimization"]
+  },
+  {
+    id: "13",
+    slug: "data-engineering",
+    title: "Data Engineering",
+    description: "Scalable data pipelines and analytics infrastructure. Warehousing, lakes, and BI.",
+    features: ["Data Pipelines", "Data Warehousing", "Data Lakes", "Analytics & BI"]
+  },
+  {
+    id: "14",
+    slug: "seo",
+    title: "SEO Optimization",
+    description: "Technical SEO and content strategy to improve search visibility and organic traffic.",
+    features: ["Technical SEO", "Keyword Strategy", "Content Optimization", "Analytics & Reporting"]
   }
 ];
 
@@ -52,7 +126,7 @@ export default function Services() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.05 }}
               className="group bg-brushedAnthracite border border-white/5 p-8 md:p-12 hover:bg-mercuryGlow transition-colors duration-500"
             >
               <div className="flex flex-col md:flex-row gap-8 md:gap-16">
@@ -79,9 +153,14 @@ export default function Services() {
                     ))}
                   </div>
 
-                  <div>
-                    <Link href="/quote">
+                  <div className="flex flex-wrap gap-6">
+                    <Link href={`/workflows/${service.slug}`}>
                       <a className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-whiteChrome group-hover:text-matteCarbon border-b border-whiteChrome/20 group-hover:border-matteCarbon/20 pb-1 transition-colors">
+                        View Workflow
+                      </a>
+                    </Link>
+                    <Link href="/quote">
+                      <a className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-liquidSilver group-hover:text-matteCarbon border-b border-liquidSilver/20 group-hover:border-matteCarbon/20 pb-1 transition-colors">
                         Discuss Project
                       </a>
                     </Link>

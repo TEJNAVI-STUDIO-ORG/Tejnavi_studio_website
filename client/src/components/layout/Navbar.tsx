@@ -8,9 +8,10 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const links = [
+    { href: "/", label: "Home" },
     { href: "/services", label: "Expertise" },
-    { href: "/portfolio", label: "Work" },
-    { href: "/about", label: "Studio" },
+    { href: "/projects", label: "Projects" },
+    { href: "/about-us", label: "About Us" },
     { href: "/contact", label: "Contact" }
   ];
 

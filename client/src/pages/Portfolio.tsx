@@ -1,58 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { PROJECTS } from "@/data/projects";
 
 const CATEGORIES = ["All", "Web", "App", "SaaS", "E-commerce", "CRM", "SEO"];
-
-const PROJECTS = [
-  {
-    id: 1,
-    title: "Lumina Analytics",
-    category: "SaaS",
-    tech: "React, Node.js, Python",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000",
-    year: "2026"
-  },
-  {
-    id: 2,
-    title: "Nexus FinTech",
-    category: "App",
-    tech: "React Native, Go",
-    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=1000",
-    year: "2025"
-  },
-  {
-    id: 3,
-    title: "Aura Commerce",
-    category: "E-commerce",
-    tech: "Next.js, Shopify",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000",
-    year: "2025"
-  },
-  {
-    id: 4,
-    title: "Vertex CRM",
-    category: "CRM",
-    tech: "Vue.js, PostgreSQL",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=1000",
-    year: "2024"
-  },
-  {
-    id: 5,
-    title: "Zenith Search",
-    category: "SEO",
-    tech: "Technical SEO, Content",
-    image: "https://images.unsplash.com/photo-1432888622747-4eb9a8f2c205?auto=format&fit=crop&q=80&w=1000",
-    year: "2026"
-  },
-  {
-    id: 6,
-    title: "Nova Dashboard",
-    category: "SaaS",
-    tech: "React, Tailwind",
-    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=1000",
-    year: "2025"
-  }
-];
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -109,8 +59,40 @@ export default function Portfolio() {
                     className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000"
                   />
                   <div className="absolute inset-0 bg-matteCarbon/40 group-hover:bg-matteCarbon/10 transition-colors duration-500"></div>
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
-                    <span className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full">View Case Study</span>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
+                    {project.caseStudyUrl && (
+                      <a 
+                        href={project.caseStudyUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors"
+                      >
+                        View Case Study
+                      </a>
+                    )}
+                    {project.repoUrl && (
+                      <a 
+                        href={project.repoUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors"
+                      >
+                        View Repo
+                      </a>
+                    )}
+                    {project.liveUrl && (
+                      <a 
+                        href={project.liveUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors"
+                      >
+                        Live Preview
+                      </a>
+                    )}
+                    {!project.caseStudyUrl && !project.repoUrl && !project.liveUrl && (
+                      <span className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full">View Case Study</span>
+                    )}
                   </div>
                 </div>
                 

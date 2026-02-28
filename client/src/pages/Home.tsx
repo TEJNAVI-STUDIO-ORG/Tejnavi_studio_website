@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Hero3D } from "@/components/home/Hero3D";
 import { Counter } from "@/components/ui/Counter";
+import { FEATURED_PROJECTS } from "@/data/projects";
 
 // Marquee Words
 const MARQUEE_WORDS = ["UI Design", "Automation", "Cloud Architecture", "Branding", "SaaS Development"];
@@ -142,70 +143,77 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-end mb-20">
             <h2 className="font-heading text-4xl md:text-6xl font-bold text-whiteChrome">SELECTED WORK</h2>
-            <Link href="/portfolio">
+            <Link href="/projects">
               <a className="hidden md:inline-block text-sm uppercase tracking-widest font-bold text-liquidSilver hover:text-whiteChrome border-b border-liquidSilver pb-1">View All</a>
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-            {/* Project 1 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="group"
-            >
-              <div className="relative aspect-[4/5] bg-brushedAnthracite mb-8 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-1000">
-                <img 
-                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000" 
-                  alt="Lumina Analytics"
-                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000"
-                />
-                <div className="absolute inset-0 bg-matteCarbon/40 group-hover:bg-matteCarbon/20 transition-colors duration-500"></div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
-                  <span className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full">View Case Study</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-3xl font-heading font-bold text-whiteChrome mb-2">Lumina Analytics</h3>
-                  <p className="text-liquidSilver">SaaS Dashboard Design</p>
-                </div>
-                <span className="text-sm font-bold tracking-widest text-ashGrey">2026</span>
-              </div>
-            </motion.div>
-
-            {/* Project 2 - Offset */}
-            <motion.div 
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="group md:mt-32"
-            >
-              <div className="relative aspect-[4/5] bg-brushedAnthracite mb-8 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-1000">
-                <img 
-                  src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=1000" 
-                  alt="Nexus FinTech"
-                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000"
-                />
-                <div className="absolute inset-0 bg-matteCarbon/40 group-hover:bg-matteCarbon/20 transition-colors duration-500"></div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
-                  <span className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full">View Case Study</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-3xl font-heading font-bold text-whiteChrome mb-2">Nexus FinTech</h3>
-                  <p className="text-liquidSilver">Full-Stack Application</p>
-                </div>
-                <span className="text-sm font-bold tracking-widest text-ashGrey">2025</span>
-              </div>
-            </motion.div>
+            {FEATURED_PROJECTS.map((project, i) => (
+                <motion.div 
+                  key={project.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className={`group ${i % 2 !== 0 ? "md:mt-32" : ""}`}
+                >
+                  <div className="relative aspect-[4/5] bg-brushedAnthracite mb-8 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-1000">
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000"
+                    />
+                    <div className="absolute inset-0 bg-matteCarbon/40 group-hover:bg-matteCarbon/20 transition-colors duration-500"></div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
+                      {project.caseStudyUrl && (
+                        <a 
+                          href={project.caseStudyUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors"
+                        >
+                          View Case Study
+                        </a>
+                      )}
+                      {project.repoUrl && (
+                        <a 
+                          href={project.repoUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors"
+                        >
+                          View Repo
+                        </a>
+                      )}
+                      {project.liveUrl && (
+                        <a 
+                          href={project.liveUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors"
+                        >
+                          Live Preview
+                        </a>
+                      )}
+                      {!project.caseStudyUrl && !project.repoUrl && !project.liveUrl && (
+                        <span className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full">View Case Study</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-3xl font-heading font-bold text-whiteChrome mb-2">{project.title}</h3>
+                      <p className="text-liquidSilver">{project.subtitle || project.tech}</p>
+                    </div>
+                    <span className="text-sm font-bold tracking-widest text-ashGrey">{project.year}</span>
+                  </div>
+                </motion.div>
+            ))}
           </div>
           
           <div className="mt-16 text-center md:hidden">
-             <Link href="/portfolio">
+             <Link href="/projects">
               <a className="inline-block text-sm uppercase tracking-widest font-bold text-liquidSilver hover:text-whiteChrome border-b border-liquidSilver pb-1">View All Projects</a>
             </Link>
           </div>
