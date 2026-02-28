@@ -36,9 +36,47 @@ export function Hero3D() {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="font-heading text-5xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter text-whiteChrome mb-8 leading-[0.9]"
+          className="font-heading text-5xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter text-whiteChrome mb-8 leading-[0.9] pointer-events-auto inline-block"
         >
-          WHERE YOUR <br /> IDEAS FIND <span className="italic text-liquidSilver">LIGHT</span>
+          <motion.span
+            className="inline-block pointer-events-auto"
+            whileHover={{ y: -6, scale: 1.06, rotate: -1 }}
+            transition={{ type: "spring", stiffness: 520, damping: 18 }}
+          >
+            WHERE
+          </motion.span>
+          {" "}
+          <motion.span
+            className="inline-block pointer-events-auto"
+            whileHover={{ y: -6, scale: 1.06, rotate: -1 }}
+            transition={{ type: "spring", stiffness: 520, damping: 18 }}
+          >
+            YOUR
+          </motion.span>
+          <br />
+          <motion.span
+            className="inline-block pointer-events-auto"
+            whileHover={{ y: -6, scale: 1.06, rotate: -1 }}
+            transition={{ type: "spring", stiffness: 520, damping: 18 }}
+          >
+            IDEAS
+          </motion.span>
+          {" "}
+          <motion.span
+            className="inline-block pointer-events-auto"
+            whileHover={{ y: -6, scale: 1.06, rotate: -1 }}
+            transition={{ type: "spring", stiffness: 520, damping: 18 }}
+          >
+            FIND
+          </motion.span>
+          {" "}
+          <motion.span
+            className="inline-block italic text-liquidSilver"
+            whileHover={{ y: -6, scale: 1.06, rotate: -1 }}
+            transition={{ type: "spring", stiffness: 520, damping: 18 }}
+          >
+            LIGHT
+          </motion.span>
         </motion.h1>
         
         <motion.p 
