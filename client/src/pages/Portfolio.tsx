@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
-const CATEGORIES = ["All", "Web", "App", "SaaS", "E-commerce"];
+const CATEGORIES = ["All", "Web", "App", "SaaS", "E-commerce", "CRM", "SEO"];
 
 const PROJECTS = [
   {
@@ -9,7 +9,7 @@ const PROJECTS = [
     title: "Lumina Analytics",
     category: "SaaS",
     tech: "React, Node.js, Python",
-    image: "bg-gradient-to-tr from-[#1A1A1A] to-[#333333]",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000",
     year: "2026"
   },
   {
@@ -17,7 +17,7 @@ const PROJECTS = [
     title: "Nexus FinTech",
     category: "App",
     tech: "React Native, Go",
-    image: "bg-gradient-to-tr from-[#0F0F0F] to-[#1A1A1A]",
+    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=1000",
     year: "2025"
   },
   {
@@ -25,16 +25,32 @@ const PROJECTS = [
     title: "Aura Commerce",
     category: "E-commerce",
     tech: "Next.js, Shopify",
-    image: "bg-gradient-to-br from-[#333333] to-[#0F0F0F]",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000",
     year: "2025"
   },
   {
     id: 4,
     title: "Vertex CRM",
-    category: "Web",
+    category: "CRM",
     tech: "Vue.js, PostgreSQL",
-    image: "bg-gradient-to-bl from-[#1E1E1E] to-[#1A1A1A]",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=1000",
     year: "2024"
+  },
+  {
+    id: 5,
+    title: "Zenith Search",
+    category: "SEO",
+    tech: "Technical SEO, Content",
+    image: "https://images.unsplash.com/photo-1432888622747-4eb9a8f2c205?auto=format&fit=crop&q=80&w=1000",
+    year: "2026"
+  },
+  {
+    id: 6,
+    title: "Nova Dashboard",
+    category: "SaaS",
+    tech: "React, Tailwind",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=1000",
+    year: "2025"
   }
 ];
 
@@ -75,7 +91,7 @@ export default function Portfolio() {
         </motion.div>
 
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16">
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, i) => (
               <motion.div 
                 key={project.id}
@@ -84,9 +100,15 @@ export default function Portfolio() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.5 }}
-                className={`group cursor-none ${i % 2 !== 0 ? 'md:mt-24' : ''}`}
+                className={`group ${i % 2 !== 0 ? 'md:mt-24' : ''}`}
               >
-                <div className={`relative aspect-[4/3] mb-6 overflow-hidden ${project.image} grayscale group-hover:grayscale-0 transition-all duration-1000`}>
+                <div className="relative aspect-[4/3] mb-6 overflow-hidden bg-brushedAnthracite grayscale group-hover:grayscale-0 transition-all duration-1000">
+                  <img 
+                    src={project.image} 
+                    alt={project.title}
+                    className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000"
+                  />
+                  <div className="absolute inset-0 bg-matteCarbon/40 group-hover:bg-matteCarbon/10 transition-colors duration-500"></div>
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
                     <span className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full">View Case Study</span>
                   </div>
