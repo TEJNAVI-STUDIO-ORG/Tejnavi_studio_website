@@ -1,3 +1,6 @@
+// This file is owned and maintained by Aditya Vispute.
+// All rights reserved.
+
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
 import { rm, readFile } from "fs/promises";

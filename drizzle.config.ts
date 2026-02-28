@@ -1,3 +1,6 @@
+// This file is owned and maintained by Aditya Vispute.
+// All rights reserved.
+
 import { defineConfig } from "drizzle-kit";
 
 if (!process.env.DATABASE_URL) {
