@@ -1,0 +1,112 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { WORKFLOWS } from "@/data/workflows";
+
+export default function WorkflowDetail() {
+    const params = useParams();
+    const router = useRouter();
+    const slug = params.slug as string;
+    const [activeStep, setActiveStep] = useState<number | null>(null);
+
+    const selectedWorkflow = WORKFLOWS.find((w) => w.slug === slug) ?? null;
+
+    if (!selectedWorkflow) {
+        router.push("/workflows");
+        return null;
+    }
+
+    return (
+        <div className="bg-matteCarbon min-h-screen pt-32 pb-24 px-6">
+            <div className="max-w-7xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-3xl mb-24"
+                >
+                    <div className="flex items-center gap-6">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (window.history.length > 1) window.history.back();
+                                else router.push("/services");
+                            }}
+                            className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-liquidSilver hover:text-whiteChrome border-b border-liquidSilver pb-1"
+                        >
+                            Back
+                        </button>
+                        <Link href="/services" className="text-sm font-bold uppercase tracking-widest text-liquidSilver/70 hover:text-liquidSilver border-b border-liquidSilver/30 hover:border-liquidSilver pb-1 transition-colors">
+                            Expertise
+                        </Link>
+                    </div>
+
+                    <h1 className="text-5xl md:text-7xl font-heading font-bold text-whiteChrome mb-6 mt-10">
+                        BUILD <span className="text-liquidSilver italic">WORKFLOWS</span>
+                    </h1>
+                    <p className="text-xl text-ashGrey font-light leading-relaxed">
+                        {selectedWorkflow.summary}
+                    </p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-0"
+                >
+                    <h2 className="text-2xl md:text-3xl font-heading font-bold text-whiteChrome mb-4">
+                        {selectedWorkflow.title}
+                    </h2>
+
+                    <div className="mt-10">
+                        <div className="space-y-8">
+                            {selectedWorkflow.steps.map((step, j) => (
+                                <div key={j} className="relative pl-2">
+                                    <div className="flex gap-8">
+                                        <div className="relative flex flex-col items-center">
+                                            <div
+                                                className={
+                                                    "w-12 h-12 rounded-full border flex items-center justify-center text-sm font-heading font-bold transition-all duration-300 relative z-10 " +
+                                                    (activeStep === j
+                                                        ? "border-whiteChrome bg-whiteChrome text-matteCarbon"
+                                                        : "border-liquidSilver text-liquidSilver")
+                                                }
+                                                onMouseEnter={() => setActiveStep(j)}
+                                                onMouseLeave={() => setActiveStep(null)}
+                                                tabIndex={0}
+                                                onFocus={() => setActiveStep(j)}
+                                                onBlur={() => setActiveStep(null)}
+                                            >
+                                                {(j + 1).toString().padStart(2, "0")}
+                                            </div>
+
+                                            <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-white/10" />
+
+                                            {j !== selectedWorkflow.steps.length - 1 ? (
+                                                <div className="w-px flex-1 bg-transparent" />
+                                            ) : null}
+                                        </div>
+
+                                        <div className="relative pt-1 flex-1">
+                                            <div className="absolute -left-6 top-6 h-px w-6 bg-white/10" />
+                                            <div className="absolute -left-6 top-6 h-6 w-6 border border-white/10 border-l-0 border-b-0 rounded-tr-xl" />
+
+                                            <h3 className="text-lg font-bold text-whiteChrome mb-2">
+                                                {step.title}
+                                            </h3>
+                                            <p className="text-ashGrey text-sm leading-relaxed max-w-2xl">
+                                                {step.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        </div>
+    );
+}
