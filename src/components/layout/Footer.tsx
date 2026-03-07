@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 type LegalDocType = "privacy" | "terms" | null;
 
 export function Footer() {
+    const { toast } = useToast();
     const [openDoc, setOpenDoc] = useState<LegalDocType>(null);
+    const [email, setEmail] = useState("");
+    const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
 
     const year = useMemo(() => new Date().getFullYear(), []);
     const lastUpdated = useMemo(() => new Date().toLocaleDateString(), []);
@@ -31,10 +35,47 @@ export function Footer() {
         return () => window.removeEventListener("keydown", onKeyDown);
     }, [openDoc]);
 
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email) return;
+
+        setStatus("submitting");
+        try {
+            const res = await fetch("/api/newsletter", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || "Failed to subscribe");
+            }
+
+            setStatus("success");
+            setEmail("");
+            toast({
+                title: "Subscribed!",
+                description: "You've successfully joined our newsletter.",
+            });
+            setTimeout(() => setStatus("idle"), 3000);
+        } catch (error: any) {
+            console.error(error);
+            setStatus("error");
+            toast({
+                title: "Subscription Failed",
+                description: error.message || "Something went wrong. Please try again.",
+                variant: "destructive",
+            });
+            setTimeout(() => setStatus("idle"), 3000);
+        }
+    };
+
     const docTitle = openDoc === "privacy" ? "Privacy Policy" : openDoc === "terms" ? "Terms of Service" : "";
 
     return (
-        <footer className="bg-matteCarbon pt-32 pb-12 px-6 border-t border-white/5">
+        <footer className="bg-matteCarbon relative overflow-hidden pt-32 pb-1 px-6 border-t border-white/5 selection:bg-whiteChrome selection:text-matteCarbon">
+            {/* Modal Logic Remains the Same */}
             <AnimatePresence>
                 {openDoc ? (
                     <motion.div
@@ -45,7 +86,7 @@ export function Footer() {
                     >
                         <motion.button
                             type="button"
-                            className="absolute inset-0 bg-black/70"
+                            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
                             onClick={() => setOpenDoc(null)}
                             aria-label="Close dialog"
                             initial={{ opacity: 0 }}
@@ -59,10 +100,10 @@ export function Footer() {
                                 aria-modal="true"
                                 aria-labelledby="legal-modal-title"
                                 className="w-full max-w-3xl bg-brushedAnthracite border border-white/10 shadow-2xl flex flex-col max-h-[calc(100vh-2rem)]"
-                                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                                initial={{ opacity: 0, y: 40, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 24, scale: 0.98 }}
-                                transition={{ type: "spring", stiffness: 260, damping: 24 }}
+                                exit={{ opacity: 0, y: 40, scale: 0.95 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
                             >
                                 <div className="flex items-start justify-between gap-6 px-6 py-5 border-b border-white/10">
                                     <div>
@@ -78,10 +119,10 @@ export function Footer() {
                                     <button
                                         type="button"
                                         onClick={() => setOpenDoc(null)}
-                                        className="inline-flex items-center justify-center w-10 h-10 border border-white/10 hover:border-white/25 hover:bg-white/5 transition-colors"
+                                        className="inline-flex items-center justify-center w-10 h-10 border border-white/10 hover:border-white/25 hover:bg-white/5 transition-colors group"
                                         aria-label="Close"
                                     >
-                                        <X className="w-5 h-5 text-whiteChrome" />
+                                        <X className="w-5 h-5 text-whiteChrome group-hover:rotate-90 transition-transform duration-300" />
                                     </button>
                                 </div>
 
@@ -89,144 +130,160 @@ export function Footer() {
                                     data-lenis-prevent
                                     onWheelCapture={(e) => e.stopPropagation()}
                                     onTouchMoveCapture={(e) => e.stopPropagation()}
-                                    className="px-6 py-6 flex-1 overflow-y-auto overscroll-contain text-ashGrey leading-relaxed [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                                    className="px-6 py-8 flex-1 overflow-y-auto overscroll-contain text-ashGrey leading-relaxed [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                                 >
+                                    {/* Policy Content (Unmodified) */}
                                     {openDoc === "privacy" ? (
-                                        <div className="space-y-6">
-                                            <p>
-                                                This Privacy Policy explains how Tejnavi Studio (the &ldquo;Website&rdquo;) collects, uses, and protects
+                                        <div className="space-y-8">
+                                            <p className="text-lg text-whiteChrome/80">
+                                                This Privacy Policy explains how Tejnavi Studio collects, uses, and protects
                                                 information when you visit or interact with this Website. This Website is created and maintained
-                                                by <span className="text-whiteChrome">Aditya Vispute</span>.
+                                                by <span className="text-whiteChrome font-medium">Aditya Vispute</span>.
                                             </p>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Information we collect</h4>
-                                                <div className="space-y-3">
-                                                    <p>
-                                                        - <span className="text-whiteChrome">Contact details</span> you provide (for example, name,
-                                                        email, and project details) when you submit forms or reach out via email.
-                                                    </p>
-                                                    <p>
-                                                        - <span className="text-whiteChrome">Usage data</span> such as pages viewed, approximate
-                                                        location, device type, and browser information. This may be collected via standard analytics
-                                                        and server logs.
-                                                    </p>
+                                            <div className="space-y-6">
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Information we collect
+                                                    </h4>
+                                                    <div className="space-y-3 pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            <strong className="text-whiteChrome font-medium">Contact details</strong> you provide (for example, name,
+                                                            email, and project details) when you submit forms or reach out via email.
+                                                        </p>
+                                                        <p>
+                                                            <strong className="text-whiteChrome font-medium">Usage data</strong> such as pages viewed, approximate
+                                                            location, device type, and browser information. This may be collected via standard analytics
+                                                            and server logs.
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">How we use information</h4>
-                                                <div className="space-y-3">
-                                                    <p>- To respond to inquiries and provide requested services or proposals.</p>
-                                                    <p>- To improve website performance, security, and user experience.</p>
-                                                    <p>- To communicate important updates related to your request or engagement.</p>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> How we use information
+                                                    </h4>
+                                                    <div className="space-y-3 pl-3.5 border-l border-white/10">
+                                                        <p>To respond to inquiries and provide requested services or proposals.</p>
+                                                        <p>To improve website performance, security, and user experience.</p>
+                                                        <p>To communicate important updates related to your request or engagement.</p>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Cookies</h4>
-                                                <p>
-                                                    The Website may use cookies or similar technologies for essential functionality and analytics.
-                                                    You can control cookies through your browser settings.
-                                                </p>
-                                            </div>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Cookies
+                                                    </h4>
+                                                    <div className="pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            The Website may use cookies or similar technologies for essential functionality and analytics.
+                                                            You can control cookies through your browser settings.
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Data sharing</h4>
-                                                <p>
-                                                    We do not sell your personal information. Information may be shared only when necessary to
-                                                    operate the Website (for example, hosting or analytics providers) or when required by law.
-                                                </p>
-                                            </div>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Data sharing
+                                                    </h4>
+                                                    <div className="pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            We do not sell your personal information. Information may be shared only when necessary to
+                                                            operate the Website (for example, hosting or analytics providers) or when required by law.
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Data retention</h4>
-                                                <p>
-                                                    We retain information only as long as needed to fulfill the purposes described above, comply
-                                                    with legal obligations, and resolve disputes.
-                                                </p>
-                                            </div>
-
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Your rights</h4>
-                                                <p>
-                                                    You may request access, correction, or deletion of your information by contacting us.
-                                                </p>
-                                            </div>
-
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Contact</h4>
-                                                <p>
-                                                    For privacy-related questions, email: <a className="text-whiteChrome hover:text-liquidSilver transition-colors" href="mailto:adityavispute29@gmail.com">adityavispute29@gmail.com</a>
-                                                </p>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Contact
+                                                    </h4>
+                                                    <div className="pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            For privacy-related questions, email: <a className="text-whiteChrome font-medium hover:text-liquidSilver transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/100" href="mailto:adityavispute29@gmail.com">adityavispute29@gmail.com</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="space-y-6">
-                                            <p>
+                                        <div className="space-y-8">
+                                            <p className="text-lg text-whiteChrome/80">
                                                 These Terms of Service govern your access to and use of the Tejnavi Studio Website. By using the
-                                                Website, you agree to these terms. This Website is created and maintained by <span className="text-whiteChrome">Aditya Vispute</span>.
+                                                Website, you agree to these terms. This Website is created and maintained by <span className="text-whiteChrome font-medium">Aditya Vispute</span>.
                                             </p>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Use of the website</h4>
-                                                <div className="space-y-3">
-                                                    <p>- You agree not to misuse the Website, attempt unauthorized access, or disrupt services.</p>
-                                                    <p>- You agree not to copy, scrape, or reverse engineer the Website in ways that violate applicable laws.</p>
+                                            <div className="space-y-6">
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Use of the website
+                                                    </h4>
+                                                    <div className="space-y-3 pl-3.5 border-l border-white/10">
+                                                        <p>You agree not to misuse the Website, attempt unauthorized access, or disrupt services.</p>
+                                                        <p>You agree not to copy, scrape, or reverse engineer the Website in ways that violate applicable laws.</p>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Intellectual property</h4>
-                                                <p>
-                                                    All content, design, and code on this Website are owned by Tejnavi Studio and/or Aditya Vispute,
-                                                    unless otherwise stated. You may not reproduce or distribute materials without prior written
-                                                    permission.
-                                                </p>
-                                            </div>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Intellectual property
+                                                    </h4>
+                                                    <div className="pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            All content, design, and code on this Website are owned by Tejnavi Studio and/or Aditya Vispute,
+                                                            unless otherwise stated. You may not reproduce or distribute materials without prior written
+                                                            permission.
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">No warranties</h4>
-                                                <p>
-                                                    The Website is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo; without warranties of any kind. We do not
-                                                    guarantee uninterrupted or error-free operation.
-                                                </p>
-                                            </div>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> No warranties
+                                                    </h4>
+                                                    <div className="pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            The Website is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo; without warranties of any kind. We do not
+                                                            guarantee uninterrupted or error-free operation.
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Limitation of liability</h4>
-                                                <p>
-                                                    To the maximum extent permitted by law, Tejnavi Studio and Aditya Vispute will not be liable
-                                                    for any indirect, incidental, special, or consequential damages arising from use of the Website.
-                                                </p>
-                                            </div>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Limitation of liability
+                                                    </h4>
+                                                    <div className="pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            To the maximum extent permitted by law, Tejnavi Studio and Aditya Vispute will not be liable
+                                                            for any indirect, incidental, special, or consequential damages arising from use of the Website.
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Changes</h4>
-                                                <p>
-                                                    We may update these Terms from time to time. Continued use of the Website after changes means
-                                                    you accept the updated terms.
-                                                </p>
-                                            </div>
-
-                                            <div>
-                                                <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-sm mb-2">Contact</h4>
-                                                <p>
-                                                    For questions about these Terms, email: <a className="text-whiteChrome hover:text-liquidSilver transition-colors" href="mailto:adityavispute29@gmail.com">adityavispute29@gmail.com</a>
-                                                </p>
+                                                <div>
+                                                    <h4 className="text-whiteChrome font-bold tracking-widest uppercase text-xs mb-3 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-whiteChrome"></span> Contact
+                                                    </h4>
+                                                    <div className="pl-3.5 border-l border-white/10">
+                                                        <p>
+                                                            For questions about these Terms, email: <a className="text-whiteChrome font-medium hover:text-liquidSilver transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/100" href="mailto:adityavispute29@gmail.com">adityavispute29@gmail.com</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="px-6 py-5 border-t border-white/10 flex items-center justify-between gap-4">
+                                <div className="px-6 py-5 border-t border-white/10 flex items-center justify-between gap-4 bg-white/[0.02]">
                                     <div className="text-xs tracking-widest uppercase text-ashGrey">
-                                        Website created by <span className="text-whiteChrome">Aditya Vispute</span>
+                                        Website created by <span className="text-whiteChrome font-bold">Aditya Vispute</span>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setOpenDoc(null)}
-                                        className="inline-flex items-center justify-center px-5 py-3 bg-whiteChrome text-matteCarbon font-bold uppercase tracking-widest text-xs hover:bg-liquidSilver transition-colors"
+                                        className="inline-flex items-center justify-center px-6 py-3 bg-whiteChrome text-matteCarbon font-bold uppercase tracking-widest text-xs hover:bg-liquidSilver transition-colors"
                                     >
                                         Close
                                     </button>
@@ -237,103 +294,114 @@ export function Footer() {
                 ) : null}
             </AnimatePresence>
 
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-                    <div className="col-span-1 md:col-span-2">
-                        <h2 className="text-4xl md:text-6xl font-heading font-bold text-whiteChrome mb-6 tracking-tight">
-                            READY TO <br /> BUILD <span className="text-liquidSilver italic">BEYOND?</span>
+            <div className="max-w-[85rem] mx-auto relative z-10 px-4 sm:px-12">
+
+                <div className="flex flex-col lg:flex-row justify-between gap-16 lg:gap-24 mb-24">
+
+                    {/* Left side: Massive CTA */}
+                    <div className="lg:w-1/2 flex flex-col justify-start">
+                        <div className="inline-flex items-center gap-3 mb-10">
+                            <div className="relative flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-whiteChrome/40 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-whiteChrome"></span>
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-widest text-ashGrey">Available for new projects</span>
+                        </div>
+
+                        <h2 className="text-5xl sm:text-6xl md:text-[5.5rem] font-heading font-bold text-whiteChrome tracking-tighter leading-[1] mb-8">
+                            LET&apos;S BUILD <br /> <span className="text-liquidSilver italic font-light">TOGETHER.</span>
                         </h2>
-                        <Link href="/quote" className="inline-block bg-whiteChrome text-matteCarbon px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-liquidSilver transition-all duration-300">
-                            Start a Project
-                        </Link>
+
+                        <div className="mt-4">
+                            <Link href="/quote" className="group rounded-full bg-whiteChrome text-matteCarbon px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-whiteChrome/90 hover:scale-105 transition-all duration-300 inline-flex items-center gap-4">
+                                Start a Project
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-all duration-300" />
+                            </Link>
+                        </div>
                     </div>
 
-                    <div>
-                        <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-sm">NAVIGATION</h4>
-                        <ul className="space-y-4 text-ashGrey">
-                            <li><Link href="/services" className="hover:text-whiteChrome transition-colors">Expertise</Link></li>
-                            <li><Link href="/projects" className="hover:text-whiteChrome transition-colors">Projects</Link></li>
-                            <li><Link href="/about-us" className="hover:text-whiteChrome transition-colors">About Us</Link></li>
-                            <li><Link href="/contact" className="hover:text-whiteChrome transition-colors">Contact</Link></li>
-                        </ul>
-                    </div>
+                    {/* Right side: Nav & Newsletter */}
+                    <div className="lg:w-1/2 grid grid-cols-2 sm:grid-cols-3 gap-10 sm:gap-6 pt-4">
 
-                    <div>
-                        <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-sm">SOCIAL</h4>
-                        <ul className="space-y-4 text-ashGrey">
-                            <li>
-                                <a
-                                    href="https://github.com/TEJNAVI-STUDIO"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
+                        {/* Navigation Links */}
+                        <div className="flex flex-col gap-6">
+                            <h4 className="text-ashGrey font-bold tracking-widest text-xs uppercase">Menu</h4>
+                            <ul className="space-y-4 text-whiteChrome/80">
+                                <li><Link href="/services" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Expertise</Link></li>
+                                <li><Link href="/projects" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Projects</Link></li>
+                                <li><Link href="/about-us" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">About Us</Link></li>
+                                <li><Link href="/blog" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Insights</Link></li>
+                                <li><Link href="/contact" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Contact</Link></li>
+                            </ul>
+                        </div>
+
+                        {/* Social Links */}
+                        <div className="flex flex-col gap-6">
+                            <h4 className="text-ashGrey font-bold tracking-widest text-xs uppercase">Socials</h4>
+                            <ul className="space-y-4 text-whiteChrome/80">
+                                <li><a href="https://github.com/TEJNAVI-STUDIO" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">GitHub</a></li>
+                                <li><a href="https://instagram.com/tejnavi.studio" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Instagram</a></li>
+                                <li><a href="https://www.solvearn.net/app/company/10703-tejnavi-studio/home" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Solvearn</a></li>
+                                <li><a href="mailto:adityavispute29@gmail.com" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Email</a></li>
+                            </ul>
+                        </div>
+
+                        {/* Newsletter Area */}
+                        <div className="col-span-2 sm:col-span-1 flex flex-col gap-6">
+                            <h4 className="text-ashGrey font-bold tracking-widest text-xs uppercase">Newsletter</h4>
+                            <p className="text-sm text-whiteChrome/60 leading-relaxed max-w-[200px]">News and insights directly to your inbox. No spam.</p>
+                            <form onSubmit={handleSubscribe} className="relative group mt-2 max-w-[250px]">
+                                <input
+                                    type="email"
+                                    placeholder="your@email.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    disabled={status === "submitting" || status === "success"}
+                                    className="w-full bg-transparent border-0 border-b border-white/20 pb-3 pr-8 text-whiteChrome focus:ring-0 focus:border-white transition-colors placeholder:text-white/20 disabled:opacity-50"
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={status === "submitting" || status === "success" || !email}
+                                    className="absolute right-0 bottom-3 text-white/50 hover:text-white disabled:opacity-50 transition-colors"
+                                    aria-label="Subscribe"
                                 >
-                                    GitHub
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="https://github.com/orgs/TEJNAVI-STUDIO-ORG"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    GitHub Org
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="https://instagram.com/tejnavi.studio"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    Instagram
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="https://www.solvearn.net/app/company/10703-tejnavi-studio/home"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    Solvearn
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="mailto:adityavispute29@gmail.com"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    Email
-                                </a>
-                            </li>
-                        </ul>
+                                    {status === "submitting" ? (
+                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    ) : status === "success" ? (
+                                        <span className="text-emerald-400 font-bold uppercase text-[10px] tracking-widest">Done</span>
+                                    ) : (
+                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                    )}
+                                </button>
+                                <div className="absolute bottom-0 left-0 h-[1px] bg-white w-0 group-focus-within:w-full transition-all duration-500 ease-out"></div>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 text-xs text-ashGrey tracking-widest uppercase">
-                    <div className="flex flex-col gap-2 text-center md:text-left">
-                        <p>&copy; {year} Aditya Vispute. All rights reserved.</p>
-                        <p className="text-ashGrey/70">Website created &amp; maintained by Aditya Vispute.</p>
+                {/* Bottom GIANT BRAND TEXT */}
+                <div className="w-full pt-10 pb-6 flex flex-col items-center border-t border-white/10">
+
+                    {/* Bottom Credits / Links */}
+                    <div className="w-full flex flex-col md:flex-row justify-between items-center text-xs text-ashGrey tracking-widest uppercase gap-6 md:gap-0 mb-16">
+                        <div className="flex flex-col md:flex-row gap-2 md:gap-8 text-center md:text-left">
+                            <p>&copy; {year} Aditya Vispute. All rights reserved.</p>
+                            <a href="mailto:adityavispute29@gmail.com" className="hover:text-white transition-colors text-ashGrey/70">
+                                adityavispute29@gmail.com
+                            </a>
+                        </div>
+                        <div className="flex space-x-6 md:space-x-12">
+                            <button type="button" onClick={() => setOpenDoc("privacy")} className="hover:text-white transition-colors underline-offset-4 hover:underline">
+                                Privacy Policy
+                            </button>
+                            <button type="button" onClick={() => setOpenDoc("terms")} className="hover:text-white transition-colors underline-offset-4 hover:underline">
+                                Terms of Service
+                            </button>
+                        </div>
                     </div>
-                    <div className="flex space-x-6 mt-4 md:mt-0">
-                        <button
-                            type="button"
-                            onClick={() => setOpenDoc("privacy")}
-                            className="hover:text-whiteChrome transition-colors"
-                        >
-                            Privacy Policy
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setOpenDoc("terms")}
-                            className="hover:text-whiteChrome transition-colors"
-                        >
-                            Terms of Service
-                        </button>
-                    </div>
+
                 </div>
             </div>
         </footer>

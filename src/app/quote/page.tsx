@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { Counter } from "@/components/ui/Counter";
-import { useToast } from "@/hooks/use-toast";
 
 const SERVICE_TYPES = [
     { id: "web", label: "Website", basePrice: 2000 },
@@ -166,13 +165,24 @@ const PRESETS = [
 ];
 
 export default function Quote() {
-    const { toast } = useToast();
+    const [step, setStep] = useState<1 | 2>(1);
     const [selections, setSelections] = useState({
         serviceType: "",
         requirement: "",
         features: [] as string[],
         timeline: "standard"
     });
+
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        description: "",
+    });
+
+    const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+    const [error, setError] = useState<string | null>(null);
 
     const toggleFeature = (featureId: string) => {
         setSelections(prev => {
@@ -233,185 +243,254 @@ export default function Quote() {
         };
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!form.name || !form.email || !form.description) {
+            setError("Please fill out your name, email, and project description.");
+            return;
+        }
+
+        setStatus("submitting");
+        setError(null);
+
+        const payload = {
+            ...form,
+            projectType: SERVICE_TYPES.find((s) => s.id === selections.serviceType)?.label || "",
+            budget: `$${calculateBreakdown().total.toLocaleString()}`,
+            timeline: TIMELINES.find((t) => t.id === selections.timeline)?.label || "",
+        };
+
+        try {
+            const res = await fetch("/api/admin/quotes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) throw new Error("Failed to submit quote");
+            setStatus("success");
+            setStep(1); // Optionally reset or stay on step 2
+        } catch (err) {
+            console.error(err);
+            setStatus("error");
+            setError("Failed to send quote request. Please try again.");
+        }
+    };
+
     return (
         <div className="bg-matteCarbon min-h-screen pt-32 pb-24 px-6">
             <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16">
 
                 {/* Left Column - Form */}
                 <div className="lg:w-2/3">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                        <h1 className="text-4xl md:text-5xl font-heading font-bold text-whiteChrome mb-4">
-                            PROJECT <span className="text-liquidSilver italic">ESTIMATOR</span>
-                        </h1>
-                        <p className="text-ashGrey mb-12">Select your requirements below for an instant ballpark estimate.</p>
-                    </motion.div>
+                    {step === 1 ? (
+                        <>
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                                <h1 className="text-4xl md:text-5xl font-heading font-bold text-whiteChrome mb-4">
+                                    PROJECT <span className="text-liquidSilver italic">ESTIMATOR</span>
+                                </h1>
+                                <p className="text-ashGrey mb-12">Select your requirements below for an instant ballpark estimate.</p>
+                            </motion.div>
 
-                    <div className="space-y-16">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.05 }}
-                        >
-                            <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">00</span>
-                                Presets
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {PRESETS.map((preset) => {
-                                    const baseService = SERVICE_TYPES.find((s) => s.id === preset.serviceType);
-                                    const requirement = (SERVICE_REQUIREMENTS[preset.serviceType] ?? []).find((r) => r.id === preset.requirement);
-                                    const featureCost = (FEATURES_BY_SERVICE[preset.serviceType] ?? []).reduce((sum, f) => {
-                                        return sum + (preset.features.includes(f.id) ? f.price : 0);
-                                    }, 0);
-                                    const subtotal = (baseService?.basePrice ?? 0) + (requirement?.price ?? 0) + featureCost;
-                                    const timeline = TIMELINES.find((t) => t.id === preset.timeline);
-                                    const total = Math.round(subtotal * (timeline?.multiplier ?? 1));
+                            <div className="space-y-16">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.05 }}
+                                >
+                                    <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
+                                        <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">00</span>
+                                        Presets
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {PRESETS.map((preset) => {
+                                            const baseService = SERVICE_TYPES.find((s) => s.id === preset.serviceType);
+                                            const requirement = (SERVICE_REQUIREMENTS[preset.serviceType] ?? []).find((r) => r.id === preset.requirement);
+                                            const featureCost = (FEATURES_BY_SERVICE[preset.serviceType] ?? []).reduce((sum, f) => {
+                                                return sum + (preset.features.includes(f.id) ? f.price : 0);
+                                            }, 0);
+                                            const subtotal = (baseService?.basePrice ?? 0) + (requirement?.price ?? 0) + featureCost;
+                                            const timeline = TIMELINES.find((t) => t.id === preset.timeline);
+                                            const total = Math.round(subtotal * (timeline?.multiplier ?? 1));
 
-                                    return (
-                                        <button
-                                            key={preset.id}
-                                            onClick={() => applyPreset(preset.id)}
-                                            className="p-6 text-left border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all duration-300"
-                                        >
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div>
-                                                    <div className="font-bold text-lg text-whiteChrome">{preset.title}</div>
-                                                    <div className="text-ashGrey text-sm mt-1">{preset.description}</div>
+                                            return (
+                                                <button
+                                                    key={preset.id}
+                                                    onClick={() => applyPreset(preset.id)}
+                                                    className="p-6 text-left border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all duration-300"
+                                                >
+                                                    <div className="flex items-start justify-between gap-4">
+                                                        <div>
+                                                            <div className="font-bold text-lg text-whiteChrome">{preset.title}</div>
+                                                            <div className="text-ashGrey text-sm mt-1">{preset.description}</div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-sm tracking-widest uppercase font-bold text-liquidSilver">From</div>
+                                                            <div className="text-xl font-heading font-bold text-whiteChrome">${total.toLocaleString()}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-5 text-sm font-bold uppercase tracking-widest text-liquidSilver border-b border-liquidSilver/30 inline-block pb-1">
+                                                        Apply Preset
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </motion.div>
+
+                                {/* Step 1: Service Type */}
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+                                    <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
+                                        <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">01A</span>
+                                        What are we building?
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {SERVICE_TYPES.map(service => (
+                                            <button
+                                                key={service.id}
+                                                onClick={() => setSelections({ ...selections, serviceType: service.id, requirement: "", features: [] })}
+                                                className={`p-6 text-left border transition-all duration-300 ${selections.serviceType === service.id
+                                                    ? 'border-whiteChrome bg-white/5'
+                                                    : 'border-white/10 hover:border-white/30 hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-bold text-lg">{service.label}</span>
+                                                    {selections.serviceType === service.id && <Check size={20} className="text-whiteChrome" />}
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="text-sm tracking-widest uppercase font-bold text-liquidSilver">From</div>
-                                                    <div className="text-xl font-heading font-bold text-whiteChrome">${total.toLocaleString()}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+
+                                {/* Step 1B: Requirements */}
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}>
+                                    <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
+                                        <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">01B</span>
+                                        What do you need inside it?
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {getRequirementsForSelection().map(req => (
+                                            <button
+                                                key={req.id}
+                                                onClick={() => setSelections({ ...selections, requirement: req.id })}
+                                                className={`p-5 text-left border transition-all duration-300 ${selections.requirement === req.id
+                                                    ? 'border-whiteChrome bg-white/5'
+                                                    : 'border-white/10 hover:border-white/30 hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-bold">{req.label}</span>
+                                                    <span className="text-sm text-liquidSilver">{req.price === 0 ? 'Included' : `+$${req.price.toLocaleString()}`}</span>
                                                 </div>
-                                            </div>
-                                            <div className="mt-5 text-sm font-bold uppercase tracking-widest text-liquidSilver border-b border-liquidSilver/30 inline-block pb-1">
-                                                Apply Preset
-                                            </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+
+                                {/* Step 2: Features */}
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}>
+                                    <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
+                                        <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">02</span>
+                                        Required Features
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {getFeaturesForSelection().map(feature => (
+                                            <button
+                                                key={feature.id}
+                                                onClick={() => toggleFeature(feature.id)}
+                                                className={`p-4 text-left border transition-all duration-300 flex items-center ${selections.features.includes(feature.id)
+                                                    ? 'border-whiteChrome bg-white/5'
+                                                    : 'border-white/10 hover:border-white/30'
+                                                    }`}
+                                            >
+                                                <div className={`w-5 h-5 rounded border mr-4 flex items-center justify-center ${selections.features.includes(feature.id) ? 'bg-whiteChrome border-whiteChrome' : 'border-white/30'}`}>
+                                                    {selections.features.includes(feature.id) && <Check size={14} className="text-matteCarbon" />}
+                                                </div>
+                                                <span className={selections.features.includes(feature.id) ? 'text-whiteChrome' : 'text-ashGrey'}>
+                                                    {feature.label}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+
+                                {/* Step 3: Timeline */}
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}>
+                                    <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
+                                        <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">03</span>
+                                        Timeline Expectation
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {TIMELINES.map(timeline => (
+                                            <button
+                                                key={timeline.id}
+                                                onClick={() => setSelections({ ...selections, timeline: timeline.id })}
+                                                className={`w-full p-5 text-left border transition-all duration-300 flex justify-between items-center ${selections.timeline === timeline.id
+                                                    ? 'border-whiteChrome bg-white/5'
+                                                    : 'border-white/10 hover:border-white/30'
+                                                    }`}
+                                            >
+                                                <span className="font-bold">{timeline.label}</span>
+                                                {selections.timeline === timeline.id && <div className="w-3 h-3 rounded-full bg-whiteChrome"></div>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            </div>
+                        </>
+                    ) : (
+                        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-brushedAnthracite p-8 md:p-12 border border-white/5">
+                            <h2 className="text-3xl font-heading font-bold text-whiteChrome mb-2">Final Step</h2>
+                            <p className="text-ashGrey mb-8">Tell us about yourself so we can send the proposal.</p>
+
+                            {status === "success" ? (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Check size={32} />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-whiteChrome mb-2">Quote Request Sent!</h3>
+                                    <p className="text-ashGrey">We have received your requirements and will be in touch shortly.</p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase tracking-widest text-liquidSilver mb-3">Your Name</label>
+                                            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="w-full bg-transparent border-0 border-b border-white/20 pb-3 text-whiteChrome focus:ring-0 focus:border-whiteChrome transition-colors" placeholder="John Doe" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase tracking-widest text-liquidSilver mb-3">Email</label>
+                                            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className="w-full bg-transparent border-0 border-b border-white/20 pb-3 text-whiteChrome focus:ring-0 focus:border-whiteChrome transition-colors" placeholder="john@company.com" />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase tracking-widest text-liquidSilver mb-3">Company (Optional)</label>
+                                            <input type="text" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="w-full bg-transparent border-0 border-b border-white/20 pb-3 text-whiteChrome focus:ring-0 focus:border-whiteChrome transition-colors" placeholder="Acme Inc." />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase tracking-widest text-liquidSilver mb-3">Phone (Optional)</label>
+                                            <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full bg-transparent border-0 border-b border-white/20 pb-3 text-whiteChrome focus:ring-0 focus:border-whiteChrome transition-colors" placeholder="+1 (555) 000-0000" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase tracking-widest text-liquidSilver mb-3">Project Details</label>
+                                        <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required rows={4} className="w-full bg-transparent border-0 border-b border-white/20 pb-3 text-whiteChrome focus:ring-0 focus:border-whiteChrome transition-colors resize-none" placeholder="Tell us more about your goals..." />
+                                    </div>
+
+                                    {error && <p className="text-red-400 text-sm">{error}</p>}
+
+                                    <div className="flex gap-4 pt-4">
+                                        <button type="button" onClick={() => setStep(1)} className="border border-white/10 text-ashGrey px-6 py-4 text-xs font-bold uppercase tracking-widest hover:text-whiteChrome transition-colors">Back</button>
+                                        <button type="submit" disabled={status === "submitting"} className="flex-1 bg-whiteChrome text-matteCarbon py-4 font-bold uppercase tracking-widest text-sm hover:bg-mercuryGlow transition-all duration-300 disabled:opacity-50">
+                                            {status === "submitting" ? "Submitting..." : "Submit Quote Request"}
                                         </button>
-                                    );
-                                })}
-                            </div>
+                                    </div>
+                                </form>
+                            )}
                         </motion.div>
-
-                        {/* Step 1: Service Type */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.1 }}
-                        >
-                            <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">01A</span>
-                                What are we building?
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {SERVICE_TYPES.map(service => (
-                                    <button
-                                        key={service.id}
-                                        onClick={() => setSelections({ ...selections, serviceType: service.id, requirement: "", features: [] })}
-                                        className={`p-6 text-left border transition-all duration-300 ${selections.serviceType === service.id
-                                                ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30 hover:bg-white/5'
-                                            }`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-bold text-lg">{service.label}</span>
-                                            {selections.serviceType === service.id && <Check size={20} className="text-whiteChrome" />}
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </motion.div>
-
-                        {/* Step 1B: Requirements */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.15 }}
-                            className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}
-                        >
-                            <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">01B</span>
-                                What do you need inside it?
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {getRequirementsForSelection().map(req => (
-                                    <button
-                                        key={req.id}
-                                        onClick={() => setSelections({ ...selections, requirement: req.id })}
-                                        className={`p-5 text-left border transition-all duration-300 ${selections.requirement === req.id
-                                                ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30 hover:bg-white/5'
-                                            }`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-bold">{req.label}</span>
-                                            <span className="text-sm text-liquidSilver">{req.price === 0 ? 'Included' : `+$${req.price.toLocaleString()}`}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </motion.div>
-
-                        {/* Step 2: Features */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}
-                        >
-                            <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">02</span>
-                                Required Features
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {getFeaturesForSelection().map(feature => (
-                                    <button
-                                        key={feature.id}
-                                        onClick={() => toggleFeature(feature.id)}
-                                        className={`p-4 text-left border transition-all duration-300 flex items-center ${selections.features.includes(feature.id)
-                                                ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30'
-                                            }`}
-                                    >
-                                        <div className={`w-5 h-5 rounded border mr-4 flex items-center justify-center ${selections.features.includes(feature.id) ? 'bg-whiteChrome border-whiteChrome' : 'border-white/30'
-                                            }`}>
-                                            {selections.features.includes(feature.id) && <Check size={14} className="text-matteCarbon" />}
-                                        </div>
-                                        <span className={selections.features.includes(feature.id) ? 'text-whiteChrome' : 'text-ashGrey'}>
-                                            {feature.label}
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
-                        </motion.div>
-
-                        {/* Step 3: Timeline */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}
-                        >
-                            <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">03</span>
-                                Timeline Expectation
-                            </h3>
-                            <div className="space-y-4">
-                                {TIMELINES.map(timeline => (
-                                    <button
-                                        key={timeline.id}
-                                        onClick={() => setSelections({ ...selections, timeline: timeline.id })}
-                                        className={`w-full p-5 text-left border transition-all duration-300 flex justify-between items-center ${selections.timeline === timeline.id
-                                                ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30'
-                                            }`}
-                                    >
-                                        <span className="font-bold">{timeline.label}</span>
-                                        {selections.timeline === timeline.id && <div className="w-3 h-3 rounded-full bg-whiteChrome"></div>}
-                                    </button>
-                                ))}
-                            </div>
-                        </motion.div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Right Column - Sticky Estimate */}
@@ -447,22 +526,18 @@ export default function Quote() {
                             </div>
                         </div>
 
-                        <button
-                            disabled={!selections.serviceType}
-                            onClick={() => {
-                                if (!selections.serviceType) return;
-                                toast({
-                                    title: "Estimate saved",
-                                    description: "Next step: share your details and we'll send a detailed proposal.",
-                                });
-                            }}
-                            className={`w-full py-4 font-bold uppercase tracking-widest text-sm flex items-center justify-center transition-all duration-300 ${selections.serviceType
+                        {step === 1 && (
+                            <button
+                                disabled={!selections.serviceType}
+                                onClick={() => setStep(2)}
+                                className={`w-full py-4 font-bold uppercase tracking-widest text-sm flex items-center justify-center transition-all duration-300 ${selections.serviceType
                                     ? 'bg-whiteChrome text-matteCarbon hover:bg-mercuryGlow'
                                     : 'bg-white/10 text-white/30 cursor-not-allowed'
-                                }`}
-                        >
-                            Continue <ArrowRight size={18} className="ml-2" />
-                        </button>
+                                    }`}
+                            >
+                                Continue <ArrowRight size={18} className="ml-2" />
+                            </button>
+                        )}
                     </div>
                 </div>
 
