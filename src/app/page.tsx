@@ -3,8 +3,8 @@
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
-import { FEATURED_PROJECTS } from "@/data/projects";
+import { useRef, useEffect, useState } from "react";
+import { PROJECTS } from "@/data/projects";
 
 const Hero3D = dynamic(
     () => import("@/components/home/Hero3D").then((mod) => mod.Hero3D),
@@ -12,45 +12,32 @@ const Hero3D = dynamic(
 );
 
 /* ── Count-Up Number Component ── */
-function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
+function CountUp({ value, suffix = "", duration = 2000 }: { value: number; suffix?: string; duration?: number }) {
     const ref = useRef<HTMLSpanElement>(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px" });
-    const displayValue = isInView ? value : 0;
+    const isInView = useInView(ref, { once: true, margin: "-80px" });
+    const [display, setDisplay] = useState(0);
+    const startedRef = useRef(false);
+
+    useEffect(() => {
+        if (!isInView || startedRef.current) return;
+        startedRef.current = true;
+
+        const startTime = performance.now();
+        const tick = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setDisplay(Math.round(eased * value));
+            if (progress < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+    }, [isInView, value, duration]);
 
     return (
-        <motion.span
-            ref={ref}
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-        >
-            <motion.span
-                initial={{ opacity: 0 }}
-                animate={isInView ? { opacity: 1 } : {}}
-                transition={{ duration: 0.3 }}
-            >
-                {isInView ? (
-                    <AnimatedNumber value={displayValue} />
-                ) : (
-                    "0"
-                )}
-                {suffix}
-            </motion.span>
-        </motion.span>
-    );
-}
-
-function AnimatedNumber({ value }: { value: number }) {
-    const ref = useRef<HTMLSpanElement>(null);
-    const isInView = useInView(ref, { once: true });
-
-    return (
-        <motion.span
-            ref={ref}
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-        >
-            {value.toLocaleString()}
-        </motion.span>
+        <span ref={ref}>
+            {display.toLocaleString()}{suffix}
+        </span>
     );
 }
 
@@ -209,14 +196,14 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ═══════════ Selected Work — Bento Grid ═══════════ */}
-            <section className="py-32 px-6">
-                <div className="max-w-[1400px] mx-auto">
+            {/* ═══════════ Selected Work — Infinite Scroll Marquee ═══════════ */}
+            <section className="py-32 overflow-hidden">
+                <div className="max-w-[1400px] mx-auto px-6 mb-12">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="flex justify-between items-end mb-16"
+                        className="flex justify-between items-end"
                     >
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-whiteChrome tracking-tight">
                             SELECTED{" "}
@@ -229,87 +216,88 @@ export default function Home() {
                             View All
                         </Link>
                     </motion.div>
-
-                    {/* Asymmetric bento grid: 1 large + 2 smaller */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {FEATURED_PROJECTS.slice(0, 4).map((project, i) => (
-                            <motion.div
-                                key={project.id}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className={`group relative overflow-hidden bg-brushedAnthracite ${i === 0 ? "md:row-span-2" : ""
-                                    }`}
-                            >
-                                <div
-                                    className={`relative overflow-hidden ${i === 0 ? "aspect-[3/4]" : "aspect-[4/3]"
-                                        }`}
-                                >
-                                    <img
-                                        src={project.image}
-                                        alt={project.title}
-                                        loading="lazy"
-                                        className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transform group-hover:scale-105 transition-all duration-700"
-                                    />
-                                    <div className="absolute inset-0 bg-matteCarbon/50 group-hover:bg-matteCarbon/20 transition-colors duration-500" />
-
-                                    {/* Hover detail slide-up */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-matteCarbon/90 to-transparent">
-                                        <p className="font-[var(--font-body)] text-ashGrey text-sm font-light">
-                                            {project.tech}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Title overlay visible always */}
-                                <div className="absolute bottom-0 left-0 right-0 p-6 group-hover:translate-y-[-40px] transition-transform duration-500">
-                                    <h3 className="text-xl md:text-2xl font-heading font-bold text-whiteChrome">
-                                        {project.title}
-                                    </h3>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    <div className="mt-12 md:hidden">
-                        <Link
-                            href="/projects"
-                            className="text-sm font-bold uppercase tracking-widest text-liquidSilver hover:text-whiteChrome border-b border-liquidSilver pb-1 transition-all duration-200"
-                        >
-                            View All Projects
-                        </Link>
-                    </div>
                 </div>
-            </section>
 
-            {/* ═══════════ CTA Section with grain texture ═══════════ */}
-            <section className="relative py-32 px-6 border-t border-white/5 overflow-hidden">
-                {/* Grain/noise texture overlay */}
-                <div className="noise-overlay absolute inset-0 pointer-events-none" />
+                {/* Infinite auto-scroll track — duplicated for seamless loop */}
+                <div
+                    className="flex gap-6"
+                    style={{ animation: "projects-marquee 35s linear infinite" }}
+                    onMouseEnter={e => (e.currentTarget.style.animationPlayState = "paused")}
+                    onMouseLeave={e => (e.currentTarget.style.animationPlayState = "running")}
+                >
+                    {[...PROJECTS, ...PROJECTS].map((project, i) => (
+                        <div
+                            key={`${project.id}-${i}`}
+                            className="group relative flex-shrink-0 w-[85vw] sm:w-[400px] md:w-[480px] aspect-[4/3] rounded-xl overflow-hidden bg-brushedAnthracite"
+                        >
+                            {/* Image (Full cover) */}
+                            <img
+                                src={project.image}
+                                alt={project.title}
+                                loading="lazy"
+                                draggable={false}
+                                className="absolute inset-0 w-full h-full object-cover grayscale md:group-hover:grayscale-0 scale-100 md:group-hover:scale-105 transition-all duration-700"
+                            />
+                            {/* Dark overlay with blur always active on mobile, hover on desktop */}
+                            <div className="absolute inset-0 bg-matteCarbon/50 md:bg-matteCarbon/40 md:group-hover:bg-matteCarbon/30 backdrop-blur-sm md:backdrop-blur-none md:group-hover:backdrop-blur-md transition-all duration-500" />
 
-                <div className="max-w-[1400px] mx-auto text-center relative z-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                            {/* Hover action buttons — centered  */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto pb-20">
+                                {project.caseStudyUrl && (
+                                    <a
+                                        href={project.caseStudyUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-6 py-2.5 rounded-full border border-white/70 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-black/20"
+                                    >
+                                        View Case Study
+                                    </a>
+                                )}
+                                {project.repoUrl && (
+                                    <a
+                                        href={project.repoUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-6 py-2.5 rounded-full border border-white/70 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-black/20"
+                                    >
+                                        View Repo
+                                    </a>
+                                )}
+                                {project.liveUrl && (
+                                    <a
+                                        href={project.liveUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-6 py-2.5 rounded-full border border-white/70 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-black/20"
+                                    >
+                                        Live Preview
+                                    </a>
+                                )}
+                            </div>
+
+                            {/* Card footer - absolute bottom, slide up on hover on desktop */}
+                            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 pt-12 bg-gradient-to-t from-matteCarbon/95 to-transparent translate-y-0 md:translate-y-8 opacity-100 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-all duration-500 ease-out z-10 pointer-events-none">
+                                <div className="text-xs text-liquidSilver/80 font-[var(--font-body)] mb-2 tracking-widest uppercase">{project.year}</div>
+                                <h3 className="text-xl md:text-2xl font-heading font-bold text-whiteChrome mb-1 tracking-tight">{project.title}</h3>
+                                {project.subtitle && (
+                                    <p className="text-xs md:text-sm font-[var(--font-body)] text-ashGrey tracking-wide">{project.subtitle}</p>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-8 md:hidden text-center">
+                    <Link
+                        href="/projects"
+                        className="text-sm font-bold uppercase tracking-widest text-liquidSilver hover:text-whiteChrome border-b border-liquidSilver pb-1 transition-all duration-200"
                     >
-                        <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-whiteChrome mb-8 tracking-tight">
-                            READY TO BUILD{" "}
-                            <span className="text-liquidSilver italic">BEYOND</span>?
-                        </h2>
-                        <p className="font-[var(--font-body)] text-xl text-ashGrey mb-12 font-light max-w-2xl mx-auto">
-                            Every great product starts with a conversation.
-                        </p>
-                        <Link
-                            href="/contact"
-                            className="inline-block bg-whiteChrome text-matteCarbon px-10 py-5 font-bold uppercase tracking-widest text-sm hover:bg-liquidSilver transition-all duration-500 transform hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.08)]"
-                        >
-                            Start the Conversation
-                        </Link>
-                    </motion.div>
+                        View All Projects
+                    </Link>
                 </div>
             </section>
+
+
         </div>
     );
 }

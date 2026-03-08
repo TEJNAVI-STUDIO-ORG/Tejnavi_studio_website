@@ -34,7 +34,7 @@ export function Footer() {
     const docTitle = openDoc === "privacy" ? "Privacy Policy" : openDoc === "terms" ? "Terms of Service" : "";
 
     return (
-        <footer className="bg-matteCarbon pt-32 pb-12 px-6 border-t border-white/5">
+        <footer className="relative bg-matteCarbon pt-32 pb-12 px-6 border-t border-white/5 overflow-hidden noise-overlay">
             <AnimatePresence>
                 {openDoc ? (
                     <motion.div
@@ -263,26 +263,6 @@ export function Footer() {
                         <ul className="space-y-4 text-ashGrey">
                             <li>
                                 <a
-                                    href="https://github.com/TEJNAVI-STUDIO"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    GitHub
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="https://github.com/orgs/TEJNAVI-STUDIO-ORG"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    GitHub Org
-                                </a>
-                            </li>
-                            <li>
-                                <a
                                     href="https://instagram.com/tejnavi.studio"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -293,17 +273,27 @@ export function Footer() {
                             </li>
                             <li>
                                 <a
-                                    href="https://www.solvearn.net/app/company/10703-tejnavi-studio/home"
+                                    href="https://linkedin.com/company/tejnavi-studio"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="hover:text-whiteChrome transition-colors"
                                 >
-                                    Solvearn
+                                    LinkedIn
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="mailto:adityavispute29@gmail.com"
+                                    href="https://wa.me/918459632402"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:text-whiteChrome transition-colors"
+                                >
+                                    WhatsApp
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="mailto:tejnavi.studio@gmail.com"
                                     className="hover:text-whiteChrome transition-colors"
                                 >
                                     Email

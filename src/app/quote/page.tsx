@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { Counter } from "@/components/ui/Counter";
 import { useToast } from "@/hooks/use-toast";
@@ -132,7 +132,7 @@ const PRESETS = [
         title: "Website Starter",
         description: "Fast launch, clean design, lead-ready.",
         serviceType: "web",
-        requirement: "landing",
+        requirement: "multipage",
         features: ["seo", "forms", "analytics"],
         timeline: "standard",
     },
@@ -141,9 +141,9 @@ const PRESETS = [
         title: "E-commerce Growth",
         description: "Store + conversions + tracking.",
         serviceType: "ecom",
-        requirement: "custom_theme",
-        features: ["payments", "shipping", "inventory", "analytics"],
-        timeline: "fast",
+        requirement: "headless",
+        features: ["payments", "shipping", "inventory", "analytics", "subscriptions"],
+        timeline: "standard",
     },
     {
         id: "saas_mvp",
@@ -167,12 +167,19 @@ const PRESETS = [
 
 export default function Quote() {
     const { toast } = useToast();
+    const [isMounted, setIsMounted] = useState(false);
+
     const [selections, setSelections] = useState({
         serviceType: "",
         requirement: "",
         features: [] as string[],
-        timeline: "standard"
+        timeline: "standard",
+        insights: ""
     });
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const toggleFeature = (featureId: string) => {
         setSelections(prev => {
@@ -192,6 +199,7 @@ export default function Quote() {
             requirement: preset.requirement,
             features: preset.features,
             timeline: preset.timeline,
+            insights: selections.insights
         });
     };
 
@@ -221,7 +229,8 @@ export default function Quote() {
         const multiplier = timeline?.multiplier ?? 1;
 
         const subtotal = base + requirementCost + featureCost;
-        const total = Math.round(subtotal * multiplier);
+        const minTotal = Math.round(subtotal * multiplier);
+        const maxTotal = minTotal > 0 ? minTotal + 1000 : 0;
 
         return {
             base,
@@ -229,34 +238,37 @@ export default function Quote() {
             featureCost,
             subtotal,
             multiplier,
-            total,
+            minTotal,
+            maxTotal
         };
     };
 
+    const breakdown = calculateBreakdown();
+    const hasSelection = selections.serviceType !== "";
+
+    if (!isMounted) return null;
+
     return (
-        <div className="bg-matteCarbon min-h-screen pt-32 pb-24 px-6">
-            <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16">
+        <div className="bg-matteCarbon min-h-screen pt-32 pb-24 px-6 font-sans">
+            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16">
 
                 {/* Left Column - Form */}
                 <div className="lg:w-2/3">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
                         <h1 className="text-4xl md:text-5xl font-heading font-bold text-whiteChrome mb-4">
                             PROJECT <span className="text-liquidSilver italic">ESTIMATOR</span>
                         </h1>
-                        <p className="text-ashGrey mb-12">Select your requirements below for an instant ballpark estimate.</p>
+                        <p className="text-ashGrey">Select your requirements below to generate a live quote estimate.</p>
                     </motion.div>
 
                     <div className="space-y-16">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.05 }}
-                        >
+                        {/* Step 1: Presets */}
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}>
                             <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">00</span>
+                                <span className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-xs mr-4 font-mono">01</span>
                                 Presets
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4">
                                 {PRESETS.map((preset) => {
                                     const baseService = SERVICE_TYPES.find((s) => s.id === preset.serviceType);
                                     const requirement = (SERVICE_REQUIREMENTS[preset.serviceType] ?? []).find((r) => r.id === preset.requirement);
@@ -265,26 +277,27 @@ export default function Quote() {
                                     }, 0);
                                     const subtotal = (baseService?.basePrice ?? 0) + (requirement?.price ?? 0) + featureCost;
                                     const timeline = TIMELINES.find((t) => t.id === preset.timeline);
-                                    const total = Math.round(subtotal * (timeline?.multiplier ?? 1));
+                                    const minT = Math.round(subtotal * (timeline?.multiplier ?? 1));
+                                    const maxT = minT + 1000;
 
                                     return (
                                         <button
                                             key={preset.id}
                                             onClick={() => applyPreset(preset.id)}
-                                            className="p-6 text-left border border-white/10 hover:border-white/30 hover:bg-white/5 transition-all duration-300"
+                                            className="p-6 text-left border border-white/5 hover:border-white/20 hover:bg-white/5 bg-brushedAnthracite transition-all duration-300 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative group"
                                         >
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div>
-                                                    <div className="font-bold text-lg text-whiteChrome">{preset.title}</div>
-                                                    <div className="text-ashGrey text-sm mt-1">{preset.description}</div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-sm tracking-widest uppercase font-bold text-liquidSilver">From</div>
-                                                    <div className="text-xl font-heading font-bold text-whiteChrome">${total.toLocaleString()}</div>
+                                            <div>
+                                                <div className="font-bold text-lg text-whiteChrome group-hover:text-white transition-colors">{preset.title}</div>
+                                                <div className="text-ashGrey text-sm mt-1">{preset.description}</div>
+                                                <div className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-liquidSilver border-b border-liquidSilver/30 inline-block pb-0.5 group-hover:text-whiteChrome group-hover:border-whiteChrome transition-colors transition-colors">
+                                                    Apply Preset
                                                 </div>
                                             </div>
-                                            <div className="mt-5 text-sm font-bold uppercase tracking-widest text-liquidSilver border-b border-liquidSilver/30 inline-block pb-1">
-                                                Apply Preset
+                                            <div className="sm:text-right flex-shrink-0">
+                                                <div className="text-[10px] tracking-[0.2em] uppercase font-bold text-liquidSilver mb-1">Estimated Range</div>
+                                                <div className="text-xl font-heading font-bold text-whiteChrome">
+                                                    ${minT.toLocaleString()} - ${maxT.toLocaleString()}
+                                                </div>
                                             </div>
                                         </button>
                                     );
@@ -292,14 +305,10 @@ export default function Quote() {
                             </div>
                         </motion.div>
 
-                        {/* Step 1: Service Type */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.1 }}
-                        >
+                        {/* Step 2: What are we building? */}
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                             <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">01A</span>
+                                <span className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-xs mr-4 font-mono">02</span>
                                 What are we building?
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -308,91 +317,100 @@ export default function Quote() {
                                         key={service.id}
                                         onClick={() => setSelections({ ...selections, serviceType: service.id, requirement: "", features: [] })}
                                         className={`p-6 text-left border transition-all duration-300 ${selections.serviceType === service.id
-                                                ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30 hover:bg-white/5'
+                                            ? 'border-whiteChrome bg-white/5'
+                                            : 'border-white/5 hover:border-white/20 bg-brushedAnthracite hover:bg-white/5'
                                             }`}
                                     >
                                         <div className="flex justify-between items-center">
-                                            <span className="font-bold text-lg">{service.label}</span>
-                                            {selections.serviceType === service.id && <Check size={20} className="text-whiteChrome" />}
+                                            <span className="font-bold text-base">{service.label}</span>
+                                            {selections.serviceType === service.id && <Check size={18} className="text-whiteChrome" />}
                                         </div>
                                     </button>
                                 ))}
                             </div>
                         </motion.div>
 
-                        {/* Step 1B: Requirements */}
+                        {/* Step 3: What do you need inside it? */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.15 }}
-                            className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}
+                            className={!selections.serviceType ? 'opacity-40 pointer-events-none' : ''}
                         >
                             <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">01B</span>
+                                <span className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-xs mr-4 font-mono">03</span>
                                 What do you need inside it?
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {getRequirementsForSelection().map(req => (
-                                    <button
-                                        key={req.id}
-                                        onClick={() => setSelections({ ...selections, requirement: req.id })}
-                                        className={`p-5 text-left border transition-all duration-300 ${selections.requirement === req.id
+                            {selections.serviceType ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {getRequirementsForSelection().map(req => (
+                                        <button
+                                            key={req.id}
+                                            onClick={() => setSelections({ ...selections, requirement: req.id })}
+                                            className={`p-5 text-left border transition-all duration-300 flex justify-between items-center ${selections.requirement === req.id
                                                 ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30 hover:bg-white/5'
-                                            }`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-bold">{req.label}</span>
-                                            <span className="text-sm text-liquidSilver">{req.price === 0 ? 'Included' : `+$${req.price.toLocaleString()}`}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
+                                                : 'border-white/5 hover:border-white/20 bg-brushedAnthracite hover:bg-white/5'
+                                                }`}
+                                        >
+                                            <span className="font-bold text-sm">{req.label}</span>
+                                            {selections.requirement === req.id && <Check size={16} className="text-whiteChrome" />}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-6 border border-white/5 text-ashGrey text-sm bg-black/20">
+                                    Please select what we are building first.
+                                </div>
+                            )}
                         </motion.div>
 
-                        {/* Step 2: Features */}
+                        {/* Step 4: Required Features */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.2 }}
-                            className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}
+                            className={!selections.serviceType ? 'opacity-40 pointer-events-none' : ''}
                         >
                             <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">02</span>
+                                <span className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-xs mr-4 font-mono">04</span>
                                 Required Features
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {getFeaturesForSelection().map(feature => (
-                                    <button
-                                        key={feature.id}
-                                        onClick={() => toggleFeature(feature.id)}
-                                        className={`p-4 text-left border transition-all duration-300 flex items-center ${selections.features.includes(feature.id)
+                            {selections.serviceType ? (
+                                <div className="grid grid-cols-1 gap-4">
+                                    {getFeaturesForSelection().map(feature => (
+                                        <button
+                                            key={feature.id}
+                                            onClick={() => toggleFeature(feature.id)}
+                                            className={`p-5 text-left border transition-all duration-300 flex items-center justify-between ${selections.features.includes(feature.id)
                                                 ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30'
-                                            }`}
-                                    >
-                                        <div className={`w-5 h-5 rounded border mr-4 flex items-center justify-center ${selections.features.includes(feature.id) ? 'bg-whiteChrome border-whiteChrome' : 'border-white/30'
-                                            }`}>
-                                            {selections.features.includes(feature.id) && <Check size={14} className="text-matteCarbon" />}
-                                        </div>
-                                        <span className={selections.features.includes(feature.id) ? 'text-whiteChrome' : 'text-ashGrey'}>
-                                            {feature.label}
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
+                                                : 'border-white/5 bg-brushedAnthracite hover:border-white/20'
+                                                }`}
+                                        >
+                                            <span className={selections.features.includes(feature.id) ? 'text-whiteChrome font-bold text-sm' : 'text-ashGrey text-sm'}>
+                                                {feature.label}
+                                            </span>
+                                            <div className={`w-5 h-5 rounded border flex flex-shrink-0 items-center justify-center ${selections.features.includes(feature.id) ? 'bg-whiteChrome border-whiteChrome' : 'border-white/20'
+                                                }`}>
+                                                {selections.features.includes(feature.id) && <Check size={14} className="text-matteCarbon" />}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-6 border border-white/5 text-ashGrey text-sm bg-black/20">
+                                    Please select what we are building first.
+                                </div>
+                            )}
                         </motion.div>
 
-                        {/* Step 3: Timeline */}
+                        {/* Step 5: Timeline Expectation */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.3 }}
-                            className={!selections.serviceType ? 'opacity-50 pointer-events-none' : ''}
                         >
                             <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
-                                <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs mr-4">03</span>
+                                <span className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-xs mr-4 font-mono">05</span>
                                 Timeline Expectation
                             </h3>
                             <div className="space-y-4">
@@ -401,69 +419,167 @@ export default function Quote() {
                                         key={timeline.id}
                                         onClick={() => setSelections({ ...selections, timeline: timeline.id })}
                                         className={`w-full p-5 text-left border transition-all duration-300 flex justify-between items-center ${selections.timeline === timeline.id
-                                                ? 'border-whiteChrome bg-white/5'
-                                                : 'border-white/10 hover:border-white/30'
+                                            ? 'border-whiteChrome bg-white/5'
+                                            : 'border-white/5 bg-brushedAnthracite hover:border-white/20'
                                             }`}
                                     >
-                                        <span className="font-bold">{timeline.label}</span>
-                                        {selections.timeline === timeline.id && <div className="w-3 h-3 rounded-full bg-whiteChrome"></div>}
+                                        <span className={`font-bold text-sm ${selections.timeline === timeline.id ? 'text-whiteChrome' : 'text-ashGrey'}`}>{timeline.label}</span>
+                                        <div className={`w-4 h-4 rounded-full border ${selections.timeline === timeline.id ? 'border-whiteChrome flex items-center justify-center' : 'border-white/20'}`}>
+                                            {selections.timeline === timeline.id && <div className="w-2 h-2 rounded-full bg-whiteChrome"></div>}
+                                        </div>
                                     </button>
                                 ))}
                             </div>
                         </motion.div>
+
+                        {/* Step 6: Project Insights */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                        >
+                            <h3 className="text-xl font-heading font-bold text-whiteChrome mb-6 flex items-center">
+                                <span className="w-8 h-8 rounded border border-white/20 flex items-center justify-center text-xs mr-4 font-mono">06</span>
+                                Project Insights
+                            </h3>
+                            <div className="w-full">
+                                <textarea
+                                    className="w-full bg-brushedAnthracite border border-white/5 p-6 text-whiteChrome focus:border-white/30 focus:outline-none transition-colors resize-y min-h-[160px] text-sm placeholder:text-white/20"
+                                    placeholder="Tell us more about your vision, specifics of your business, or any key problems..."
+                                    value={selections.insights}
+                                    onChange={(e) => setSelections({ ...selections, insights: e.target.value })}
+                                />
+                            </div>
+                        </motion.div>
+
                     </div>
                 </div>
 
                 {/* Right Column - Sticky Estimate */}
                 <div className="lg:w-1/3">
-                    <div className="sticky top-32 bg-brushedAnthracite border border-white/10 p-8">
-                        <h4 className="text-sm tracking-widest uppercase font-bold text-liquidSilver mb-8">Estimated Investment</h4>
+                    <div className="sticky top-32">
+                        {/* Estimate Card */}
+                        <div className="bg-[#141414] border border-white/5 p-8 shadow-2xl">
+                            <h4 className="text-[11px] tracking-[0.2em] uppercase font-bold text-whiteChrome mb-8">Estimated Investment</h4>
 
-                        <div className="text-5xl font-heading font-bold text-whiteChrome mb-2">
-                            $<Counter value={calculateBreakdown().total} />
+                            <div className="text-4xl lg:text-4xl font-heading font-bold text-whiteChrome mb-4 flex items-center flex-wrap">
+                                {hasSelection && breakdown.minTotal > 0 ? (
+                                    <>
+                                        $<Counter value={breakdown.minTotal} />
+                                        <span className="text-whiteChrome mx-2 text-3xl">-</span>
+                                        $<Counter value={breakdown.maxTotal} />
+                                    </>
+                                ) : (
+                                    <>
+                                        $ - $999
+                                    </>
+                                )}
+                            </div>
+                            <p className="text-ashGrey text-[12px] mb-10 leading-relaxed border-b border-lightGrey/10 pb-10">
+                                *This is a ballpark estimate. Final cost depends on full scope.
+                            </p>
+
+                            <div className="space-y-6 mb-10 text-[13px]">
+                                <div className="flex justify-between items-start border-b border-lightGrey/10 pb-6">
+                                    <span className="text-ashGrey">Base:</span>
+                                    <span className="text-whiteChrome text-right">{hasSelection ? SERVICE_TYPES.find(s => s.id === selections.serviceType)?.label : 'Not selected'}</span>
+                                </div>
+                                <div className="flex justify-between items-start border-b border-lightGrey/10 pb-6">
+                                    <span className="text-ashGrey">Scope:</span>
+                                    <span className="text-whiteChrome text-right">{hasSelection && selections.requirement ? (getRequirementsForSelection().find(r => r.id === selections.requirement)?.label ?? 'Not selected') : 'Not selected'}</span>
+                                </div>
+                                <div className="flex flex-col border-b border-lightGrey/10 pb-6">
+                                    <span className="text-ashGrey mb-4">Features:</span>
+                                    <div className="flex flex-wrap gap-2">
+                                        {hasSelection && selections.features.length > 0 ? (
+                                            selections.features.map(fId => {
+                                                const feature = getFeaturesForSelection().find(f => f.id === fId);
+                                                return feature ? (
+                                                    <span key={feature.id} className="text-[9px] uppercase tracking-wider text-ashGrey border border-white/10 rounded px-2.5 py-1.5 bg-white/5 hover:bg-white/10 transition-colors">
+                                                        {feature.label}
+                                                    </span>
+                                                ) : null;
+                                            })
+                                        ) : (
+                                            <span className="text-whiteChrome text-right">None selected</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center border-b border-lightGrey/10 pb-6">
+                                    <span className="text-ashGrey">Timeline:</span>
+                                    <span className="text-whiteChrome text-right">{TIMELINES.find(t => t.id === selections.timeline)?.label}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-ashGrey">Rush Factor:</span>
+                                    <span className="text-whiteChrome text-right">×{breakdown.multiplier}</span>
+                                </div>
+                            </div>
+
+                            <button
+                                disabled={!hasSelection}
+                                onClick={() => {
+                                    if (!hasSelection) return;
+                                    toast({
+                                        title: "Estimate saved",
+                                        description: "Next step: share your details and we'll send a detailed proposal.",
+                                    });
+                                }}
+                                className={`w-full py-5 mt-4 font-bold uppercase tracking-[0.2em] text-xs flex items-center justify-center transition-all duration-300 ${hasSelection
+                                    ? 'bg-white text-matteCarbon hover:bg-white/90 cursor-pointer'
+                                    : 'bg-white text-matteCarbon opacity-50 cursor-not-allowed'
+                                    }`}
+                            >
+                                CONTINUE <ArrowRight size={16} className="ml-2" />
+                            </button>
                         </div>
-                        <p className="text-ashGrey text-sm mb-8">*This is a ballpark estimate. Final cost depends on full scope.</p>
-
-                        <div className="space-y-4 mb-8 text-sm">
-                            <div className="flex justify-between border-b border-white/5 pb-4">
-                                <span className="text-ashGrey">Base:</span>
-                                <span className="text-whiteChrome">{selections.serviceType ? SERVICE_TYPES.find(s => s.id === selections.serviceType)?.label : 'Not selected'}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-white/5 pb-4">
-                                <span className="text-ashGrey">Scope:</span>
-                                <span className="text-whiteChrome">{selections.requirement ? (getRequirementsForSelection().find(r => r.id === selections.requirement)?.label ?? 'Not selected') : 'Not selected'}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-white/5 pb-4">
-                                <span className="text-ashGrey">Features:</span>
-                                <span className="text-whiteChrome">{selections.features.length} selected</span>
-                            </div>
-                            <div className="flex justify-between border-b border-white/5 pb-4">
-                                <span className="text-ashGrey">Timeline:</span>
-                                <span className="text-whiteChrome">{TIMELINES.find(t => t.id === selections.timeline)?.label}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-ashGrey">Rush Factor:</span>
-                                <span className="text-whiteChrome">×{calculateBreakdown().multiplier}</span>
-                            </div>
-                        </div>
-
-                        <button
-                            disabled={!selections.serviceType}
-                            onClick={() => {
-                                if (!selections.serviceType) return;
-                                toast({
-                                    title: "Estimate saved",
-                                    description: "Next step: share your details and we'll send a detailed proposal.",
-                                });
-                            }}
-                            className={`w-full py-4 font-bold uppercase tracking-widest text-sm flex items-center justify-center transition-all duration-300 ${selections.serviceType
-                                    ? 'bg-whiteChrome text-matteCarbon hover:bg-mercuryGlow'
-                                    : 'bg-white/10 text-white/30 cursor-not-allowed'
-                                }`}
-                        >
-                            Continue <ArrowRight size={18} className="ml-2" />
-                        </button>
                     </div>
+                </div>
+
+            </div>
+
+            {/* Inclusions and Philosophy Section - Below everything */}
+            <div className="max-w-7xl mx-auto mt-24 pt-12 border-t border-white/5 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+                {/* Left: Our Pricing Philosophy */}
+                <div>
+                    <h2 className="text-4xl md:text-5xl font-heading font-bold text-whiteChrome mb-8">OUR PRICING <span className="italic text-liquidSilver">PHILOSOPHY</span></h2>
+                    <p className="text-ashGrey text-sm leading-relaxed mb-6">
+                        We don&apos;t believe in one-size-fits-all pricing. Every project we take on is unique, requiring a custom approach to engineering and design. Our estimates reflect the depth of craftsmanship and the premium quality we deliver.
+                    </p>
+                    <p className="text-ashGrey text-sm leading-relaxed">
+                        This range provided here helps you understand the investment required for your vision. Once we discuss the details, we&apos;ll provide a firm quote tailored to your exact needs.
+                    </p>
+                </div>
+
+                {/* Right: What's included in every estimate */}
+                <div className="bg-[#141414] border border-white/5 p-8 shadow-2xl">
+                    <h5 className="text-whiteChrome font-bold text-lg mb-6">What&apos;s included in every estimate?</h5>
+                    <ul className="space-y-4">
+                        <li className="flex text-ashGrey text-sm items-center">
+                            <Check size={16} className="mr-4 text-whiteChrome shrink-0" />
+                            Dedicated Project Manager
+                        </li>
+                        <li className="flex text-ashGrey text-sm items-center">
+                            <Check size={16} className="mr-4 text-whiteChrome shrink-0" />
+                            Weekly Progress Syncs
+                        </li>
+                        <li className="flex text-ashGrey text-sm items-center">
+                            <Check size={16} className="mr-4 text-whiteChrome shrink-0" />
+                            Rigorous Quality Assurance
+                        </li>
+                        <li className="flex text-ashGrey text-sm items-center">
+                            <Check size={16} className="mr-4 text-whiteChrome shrink-0" />
+                            Responsive Design (Mobile/Desktop)
+                        </li>
+                        <li className="flex text-ashGrey text-sm items-center">
+                            <Check size={16} className="mr-4 text-whiteChrome shrink-0" />
+                            Performance Optimization
+                        </li>
+                        <li className="flex text-ashGrey text-sm items-center">
+                            <Check size={16} className="mr-4 text-whiteChrome shrink-0" />
+                            30 Days Post-Launch Support
+                        </li>
+                    </ul>
                 </div>
 
             </div>

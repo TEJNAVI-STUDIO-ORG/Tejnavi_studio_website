@@ -84,4 +84,4 @@ export const PROJECTS: Project[] = [
   }
 ];
 
-export const FEATURED_PROJECTS = PROJECTS.slice(0, 4);
+export const FEATURED_PROJECTS = PROJECTS.slice(0, 6);

@@ -56,8 +56,17 @@ export default function About() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-3xl font-heading font-bold text-whiteChrome mb-12">The Team</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <h2 className="text-3xl font-heading font-bold text-whiteChrome mb-8">Our Team</h2>
+
+                    {/* Team Photo Placeholder */}
+                    <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-brushedAnthracite rounded-2xl border border-white/5 mb-16 flex flex-col items-center justify-center text-ashGrey hover:bg-white/[0.03] transition-colors group">
+                        <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-white/20 transition-all duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                        </div>
+                        <span className="text-xs uppercase tracking-[0.2em] font-bold">Team Photo</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {[
                             { name: "Aditya", role: "Backend Dev, FrontEnd Dev, Co-Founder", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400&h=500" },
                             { name: "Tejas", role: "Founder, Frontend Dev", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400&h=500" },
@@ -74,7 +83,7 @@ export default function About() {
                                 transition={{ delay: index * 0.1 }}
                                 className="group"
                             >
-                                <div className="aspect-[3/4] bg-brushedAnthracite mb-6 relative overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
+                                <div className="aspect-[3/4] bg-brushedAnthracite mb-4 relative overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
                                     <img
                                         src={member.image}
                                         alt={member.name}
@@ -82,8 +91,8 @@ export default function About() {
                                     />
                                     <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-colors duration-500"></div>
                                 </div>
-                                <h3 className="text-xl font-heading font-bold text-whiteChrome mb-1">{member.name}</h3>
-                                <p className="text-liquidSilver text-sm tracking-widest uppercase font-bold">{member.role}</p>
+                                <h3 className="text-lg font-heading font-bold text-whiteChrome mb-0.5">{member.name}</h3>
+                                <p className="text-ashGrey text-xs tracking-widest uppercase font-bold">{member.role}</p>
                             </motion.div>
                         ))}
                     </div>

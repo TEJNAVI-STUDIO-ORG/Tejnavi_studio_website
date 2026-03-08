@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { motion, useMotionValue, useSpring, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useScroll, useTransform, useMotionTemplate } from "framer-motion";
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
@@ -69,17 +69,16 @@ function MagneticButton({ children, href }: { children: React.ReactNode; href: s
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ x: springX, y: springY }}
-            className="inline-block"
+            className="inline-block relative p-[1px] group overflow-hidden"
         >
+            {/* Shimmer Border Background */}
+            <span className="absolute inset-[-150%] animate-[spin_3s_linear_infinite] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(0,0,0,0.6)_360deg)] pointer-events-none" />
+
             <Link
                 href={href}
-                className="group relative inline-flex items-center bg-whiteChrome text-matteCarbon px-10 py-5 font-bold uppercase tracking-widest text-sm overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+                className="relative z-10 block bg-whiteChrome text-matteCarbon px-10 py-5 font-bold uppercase tracking-widest text-sm transition-all duration-500 hover:shadow-[0_0_40px_rgba(255,255,255,0.15)]"
             >
-                <span className="relative z-10">Get a Quote</span>
-                {/* Border shimmer on hover */}
-                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                    <span className="absolute inset-0 border border-white/30 animate-pulse" />
-                </span>
+                {children}
             </Link>
         </motion.div>
     );
@@ -92,6 +91,10 @@ export function Hero3D() {
     const mouseY = useMotionValue(0.5);
     const glowX = useSpring(mouseX, { stiffness: 60, damping: 30 });
     const glowY = useSpring(mouseY, { stiffness: 60, damping: 30 });
+
+    const glowXPct = useTransform(glowX, (v) => `${v * 100}%`);
+    const glowYPct = useTransform(glowY, (v) => `${v * 100}%`);
+    const bgGlow = useMotionTemplate`radial-gradient(600px circle at ${glowXPct} ${glowYPct}, rgba(255,255,255,0.04), transparent 60%)`;
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -115,18 +118,20 @@ export function Hero3D() {
             <motion.div
                 className="absolute inset-0 pointer-events-none z-0"
                 style={{
-                    background: `radial-gradient(600px circle at ${glowX.get() * 100}% ${glowY.get() * 100}%, rgba(255,255,255,0.04), transparent 60%)`,
+                    background: bgGlow,
                 }}
             />
 
             {/* Animated dot grid overlay */}
-            <div
+            <motion.div
                 className="absolute inset-0 pointer-events-none z-0 opacity-[0.03]"
                 style={{
                     backgroundImage:
                         "radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)",
                     backgroundSize: "24px 24px",
                 }}
+                animate={{ backgroundPosition: ["0px 0px", "24px 24px"] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
             />
 
             {/* Content grid: left text, right 3D */}
@@ -139,7 +144,7 @@ export function Hero3D() {
                         animate="visible"
                         className="mb-8"
                     >
-                        <div className="font-heading text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.04em] text-whiteChrome leading-[0.92]">
+                        <div className="font-heading text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-[-0.04em] text-whiteChrome leading-[0.92] overflow-visible">
                             {heroWords.map((word) => (
                                 <motion.span
                                     key={word}
@@ -151,11 +156,14 @@ export function Hero3D() {
                                 </motion.span>
                             ))}
                             <br />
-                            {/* "LIGHT" with clip-path wipe reveal */}
+                            {/* "LIGHT" with clip-path wipe reveal — pr-4 prevents italic T from clipping */}
                             <motion.span
-                                className="inline-block italic text-liquidSilver"
+                                className="inline-block italic pr-4"
+                                style={{
+                                    color: "#D4D4D4"
+                                }}
                                 initial={{ clipPath: "inset(0 100% 0 0)" }}
-                                animate={lightRevealed ? { clipPath: "inset(0 0% 0 0)" } : {}}
+                                animate={lightRevealed ? { clipPath: "inset(0 -5% 0 0)" } : {}}
                                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                                 whileHover={{ y: -6, scale: 1.04, rotate: -1 }}
                             >
@@ -183,27 +191,22 @@ export function Hero3D() {
                     </motion.div>
                 </div>
 
-                {/* Right: 3D sphere */}
+                {/* Right: 3D sphere — clipped to a circle */}
                 <div className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center">
-                    <div className="absolute inset-0 opacity-60 mix-blend-screen">
-                        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-                            <ambientLight intensity={0.5} />
-                            <directionalLight position={[2, 5, 2]} intensity={1.5} color="#F5F5F5" />
-                            <directionalLight position={[-2, -5, -2]} intensity={0.5} color="#1A1A1A" />
+                    <div
+                        className="rounded-full overflow-hidden opacity-70 mix-blend-screen"
+                        style={{ width: "min(440px, 90vw)", height: "min(440px, 90vw)" }}
+                    >
+                        <Canvas camera={{ position: [0, 0, 5], fov: 45 }} style={{ width: "100%", height: "100%" }}>
+                            <ambientLight intensity={0.6} />
+                            <directionalLight position={[3, 5, 3]} intensity={2} color="#FFFFFF" />
+                            <directionalLight position={[-2, -5, -2]} intensity={0.4} color="#1A1A1A" />
+                            <pointLight position={[0, 0, 4]} intensity={0.8} color="#ffffff" />
                             <AnimatedSphere />
                         </Canvas>
                     </div>
                 </div>
             </div>
-
-            {/* Scroll indicator */}
-            <motion.div
-                className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-40 z-10"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-            >
-                <div className="w-[1px] h-16 bg-gradient-to-b from-whiteChrome to-transparent" />
-            </motion.div>
         </div>
     );
 }

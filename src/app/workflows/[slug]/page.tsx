@@ -38,9 +38,6 @@ export default function WorkflowDetail() {
                         >
                             Back
                         </button>
-                        <Link href="/services" className="text-sm font-bold uppercase tracking-widest text-liquidSilver/70 hover:text-liquidSilver border-b border-liquidSilver/30 hover:border-liquidSilver pb-1 transition-colors">
-                            Expertise
-                        </Link>
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-heading font-bold text-whiteChrome mb-6 mt-10">
