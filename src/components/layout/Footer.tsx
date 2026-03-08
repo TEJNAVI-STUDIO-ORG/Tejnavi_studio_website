@@ -345,48 +345,49 @@ export function Footer() {
                             </ul>
                         </div>
 
-                    <div>
-                        <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-sm">SOCIAL</h4>
-                        <ul className="space-y-4 text-ashGrey">
-                            <li>
-                                <a
-                                    href="https://instagram.com/tejnavi.studio"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    Instagram
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="https://linkedin.com/company/tejnavi-studio"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    LinkedIn
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="https://wa.me/918459632402"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    WhatsApp
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="mailto:tejnavi.studio@gmail.com"
-                                    className="hover:text-whiteChrome transition-colors"
-                                >
-                                    Email
-                                </a>
-                            </li>
-                        </ul>
+                        <div>
+                            <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-sm">SOCIAL</h4>
+                            <ul className="space-y-4 text-ashGrey">
+                                <li>
+                                    <a
+                                        href="https://instagram.com/tejnavi.studio"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-whiteChrome transition-colors"
+                                    >
+                                        Instagram
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://linkedin.com/company/tejnavi-studio"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-whiteChrome transition-colors"
+                                    >
+                                        LinkedIn
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://wa.me/918459632402"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-whiteChrome transition-colors"
+                                    >
+                                        WhatsApp
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="mailto:tejnavi.studio@gmail.com"
+                                        className="hover:text-whiteChrome transition-colors"
+                                    >
+                                        Email
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 

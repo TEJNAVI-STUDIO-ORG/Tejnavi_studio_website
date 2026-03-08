@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { Counter } from "@/components/ui/Counter";
+import { useToast } from "@/hooks/use-toast";
 
 const SERVICE_TYPES = [
     { id: "web", label: "Website", basePrice: 2000 },
