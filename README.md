@@ -1,88 +1,109 @@
-# Studio (Refined)
+# Tejnavi Studio | Premium Digital Craftsmanship
 
-Premium dark-mode studio website built with a modern React + TypeScript stack.
+A cutting-edge, ultra-premium digital product agency website and full-stack Content Management System. Built with a focus on world-class aesthetics, fluid animations, and robust backend architecture.
 
-## Overview
+## 🚀 Tech Stack
 
-This repository contains the Tejnavi Studio website and supporting services.
+This project has been completely migrated to a modern, scalable full-stack architecture:
 
-- **Frontend**: `client/` (React + TypeScript + Vite)
-- **Backend**: `server/` (Node.js server used by the project)
-- **Shared types**: `shared/`
+- **Framework:** Next.js 14 (App Router, Server Components, Server Actions)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS, custom utility classes, CSS Variables
+- **Animations:** Framer Motion, Lenis (Smooth Scrolling)
+- **Database:** PostgreSQL (hosted on Neon)
+- **ORM:** Prisma
+- **Authentication:** NextAuth.js v5 (Auth.js) / Credentials Provider
+- **Forms & Validation:** React Hook Form, Zod
+- **Email:** Nodemailer (SMTP Integration)
+- **Icons:** Lucide React
 
-The UI follows a monochrome / metallic theme and includes smooth motion and micro-interactions.
+## ✨ Key Features & Accomplishments
 
-## Key Features
+### 1. Premium Frontend (Marketing Site)
+- **Stunning UI/UX:** Dark-mode primary theme featuring brushed metal (`bg-brushedAnthracite`), liquid silver (`text-liquidSilver`), and matte carbon (`bg-matteCarbon`) aesthetics.
+- **Fluid Animations:** Integrated Lenis for global smooth scrolling (desktop) and Framer Motion for scroll-linked entrance animations, magnetic buttons, and 3D tilts.
+- **Dynamic Content:** Projects, Blog posts, and Testimonials are fully driven by the PostgreSQL database.
+- **Quote Estimator:** Interactive, multi-step project cost calculator with dynamic pricing logic and lead capture.
+- **Contact & Newsletter:** Fully functional forms that insert leads into the database and trigger automated SMTP email notifications.
 
-- **Pages**
-  - Home
-  - Services / Expertise
-  - Workflows (supports route `workflows/:slug`)
-  - Quote / Project Estimator (presets + selections + estimate breakdown)
-  - About, Contact, Projects
+### 2. Full-Stack Admin Dashboard (`/admin`)
+- **Secure Authentication:** Protected routes using NextAuth session middleware. Users cannot access `/admin/*` without logging in.
+- **Role-Based Access Control (RBAC):** Implementation of Superadmin, Admin, and Editor roles to strictly manage permissions (e.g., only Superadmins can add new team members).
+- **Custom CMS:** 
+  - **Projects:** Full CRUD interface to manage portfolio items, track live URLs/GitHub repos, upload cover images, and toggle "Featured" or "Published" status.
+  - **Blog:** Markdown-supported blog editor with category tagging, read-time tracking, SEO meta fields, and image uploads.
+  - **Testimonials:** Manage client reviews and dynamic 5-star rating generation.
+  - **Contacts & Quotes:** View and track all inbound leads from the frontend forms.
+  - **Newsletter Subscribers:** View all active email subscribers.
+- **Bulletproof Modals:** Custom Tailwind UI implementation for flawless internal scroll management within all creation/editing forms.
 
-- **Workflows**
-  - Single-workflow view based on URL slug
-  - Vertical timeline/stepper styling
+## 🛠 Getting Started (Local Development)
 
-- **Quote / Estimator**
-  - Service type selection
-  - Requirement scoping per service type
-  - Feature add-ons
-  - Timeline multipliers
-  - Presets displayed as normal cards (grid)
+### 1. Prerequisites
+- Node.js (v18+)
+- A PostgreSQL database (Neon.tech is recommended)
+- An SMTP server/email provider (like Gmail App Passwords or Resend) for sending emails.
 
-- **Legal & Ownership**
-  - Footer includes **Privacy Policy** and **Terms of Service** as animated modal popups
-  - Contact email: `adityavispute29@gmail.com`
-  - Site attribution: **Aditya Vispute**
+### 2. Installation
+Clone the repository and install dependencies:
+```bash
+npm install
+```
 
-## Tech Stack
+### 3. Environment Variables
+Create a `.env` file in the root directory and configure the following variables:
 
-- **React + TypeScript**
-- **Vite**
-- **Tailwind CSS**
-- **Framer Motion** (animations)
-- **Wouter** (routing)
-- **@tanstack/react-query**
-- **Lenis** (smooth scrolling)
-- **Radix UI / shadcn/ui** (UI primitives)
+```env
+# Database
+DATABASE_URL="postgres://user:password@endpoint.neon.tech/tejnavi?sslmode=require"
 
-## Project Structure (high level)
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-super-secret-32-character-string" # Run `openssl rand -base64 32` to generate
 
-- `client/`
-  - `src/pages/` — route pages
-  - `src/components/` — shared UI + layout components (`Navbar`, `Footer`, etc.)
-  - `src/data/` — data modules (ex: workflows)
-- `server/` — backend code
-- `shared/` — shared types/utilities
+# Email / SMTP Settings
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_SECURE="false"
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
+SMTP_FROM="your-email@gmail.com"
+```
 
+### 4. Database Setup
+Push the Prisma schema to your database and generate the Prisma Client:
+```bash
+npx prisma generate
+npx prisma db push
+```
 
+### 5. Seed the Superadmin User
+To access the admin panel, you must create an initial Superadmin account. Run the master seed script:
+```bash
+npx tsx scripts/seed.ts
+```
+Login credentials created by the script:
+- **Email:** root@tejnavistudio.com
+- **Password:** tejnavidev2026
 
-## Screenshots
+### 6. Start the Development Server
+```bash
+npm run dev
+```
+Open `http://localhost:3000` for the frontend and `http://localhost:3000/admin` for the dashboard!
 
-Here are some screenshots of the Tejnavi Studio website:
+## 📂 Project Structure
 
-### Home Page
-![Home Page](SCREENSHOTS/home.png)
+- `src/app/` - Next.js App Router. Contains all frontend (`/`) and admin (`/admin`) routes.
+- `src/components/` - Shared UI components (Layout, UI primitives, Admin specific components).
+- `src/lib/` - Utility functions, Prisma database client instantiation, email dispatcher.
+- `prisma/` - Database schema definition (`schema.prisma`) and seeder scripts.
+- `public/` - Static assets, images, and brand icons.
 
-### Projects Page
-![Projects Page](SCREENSHOTS/projects.png)
+## 🔒 Security Notes
+- API Routes (`/api/admin/*`) strictly verify sessions before processing mutations (POST, PUT, DELETE).
+- Plaintext passwords are NEVER saved; all user passwords use `bcryptjs` hashing.
+- Smooth scrolling logic is intentionally disabled globally inside `/admin` to allow for native, uninterrupted data interactions and modal overlays.
 
-### About Page
-![About Page](SCREENSHOTS/about.png)
-
-### Contact Page
-![Contact Page](SCREENSHOTS/contact.png)
-
-### Quotation Page
-![Quotation Page](SCREENSHOTS/quotation.png)
-
-## Notes
-
-- The global HTML metadata is in `client/index.html`.
-- The global footer is in `client/src/components/layout/Footer.tsx`.
-
-## Copyright
-
-© 2026 Aditya Vispute. All rights reserved.
+---
+© 2026 Tejnavi Studio. Developed by Tejnavi Studio.

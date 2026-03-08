@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { db } from "@/lib/db";
+import { contactSubmissions } from "@/lib/db/schema";
 
 const OFFICIAL_EMAIL = "tejnavi.studio@gmail.com";
 
@@ -27,6 +29,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Save to database
+        try {
+            await db.insert(contactSubmissions).values({
+                name: name || null,
+                email,
+                service: service || null,
+                message,
+            });
+        } catch (dbError) {
+            // Don't fail the request if DB save fails — still try to send email
+            console.error("Failed to save contact to DB:", dbError);
+        }
+
+        // Send email notification
         const subject = `New inquiry (${service || "general"}) from ${name || "Website visitor"}`;
         const textLines = [
             `Name: ${name || "N/A"}`,
@@ -37,7 +53,7 @@ export async function POST(request: NextRequest) {
         ];
 
         if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-            console.warn("SMTP environment variables are not fully configured; skipping email send.");
+            console.warn("SMTP not configured; skipping email.");
             return NextResponse.json({
                 message: "Contact received (email not sent – SMTP not configured).",
             });
