@@ -320,7 +320,7 @@ export function Footer() {
                     </div>
 
                     {/* Right side: Nav & Newsletter */}
-                    <div className="lg:w-1/2 grid grid-cols-2 sm:grid-cols-3 gap-10 sm:gap-6 pt-4">
+                    <div className="lg:w-1/2 grid grid-cols-2 gap-10 sm:gap-6 pt-4">
 
                         {/* Navigation Links */}
                         <div className="flex flex-col gap-6">
@@ -331,17 +331,6 @@ export function Footer() {
                                 <li><Link href="/about-us" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">About Us</Link></li>
                                 <li><Link href="/blog" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Insights</Link></li>
                                 <li><Link href="/contact" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Contact</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* Social Links */}
-                        <div className="flex flex-col gap-6">
-                            <h4 className="text-ashGrey font-bold tracking-widest text-xs uppercase">Socials</h4>
-                            <ul className="space-y-4 text-whiteChrome/80">
-                                <li><a href="https://github.com/TEJNAVI-STUDIO" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">GitHub</a></li>
-                                <li><a href="https://instagram.com/tejnavi.studio" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Instagram</a></li>
-                                <li><a href="https://www.solvearn.net/app/company/10703-tejnavi-studio/home" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Solvearn</a></li>
-                                <li><a href="mailto:adityavispute29@gmail.com" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Email</a></li>
                             </ul>
                         </div>
 
