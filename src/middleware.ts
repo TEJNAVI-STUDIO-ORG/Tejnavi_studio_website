@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth.config";
 
-export async function middleware(req: NextRequest) {
+const { auth } = NextAuth(authConfig);
+
+export default auth((req) => {
     const { pathname } = req.nextUrl;
-
-    // We use NextAuth's JWT getToken helper which works perfectly on the Edge runtime
-    // We must pass the request and the secret explicitly
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    const isAuthenticated = !!token;
+    const isAuthenticated = !!req.auth;
 
     // If user is already logged in, prevent them from going back to the login page
     if (pathname.toLowerCase().startsWith("/admin/login")) {
@@ -33,8 +31,9 @@ export async function middleware(req: NextRequest) {
         }
     }
 
-    return NextResponse.next();
-}
+    // If no specific action is taken, allow the request to proceed
+    // The `auth` wrapper implicitly calls NextResponse.next() if no response is returned.
+});
 
 export const config = {
     matcher: ["/admin/:path*", "/api/admin/:path*"],
