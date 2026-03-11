@@ -5,7 +5,7 @@ export default auth((req) => {
     const { pathname } = req.nextUrl;
 
     // If user is already logged in, prevent them from going back to the login page
-    if (pathname === "/admin/login") {
+    if (pathname.toLowerCase().startsWith("/admin/login")) {
         if (req.auth) {
             return NextResponse.redirect(new URL("/admin", req.url));
         }

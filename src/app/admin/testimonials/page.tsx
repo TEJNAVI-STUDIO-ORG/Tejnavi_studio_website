@@ -61,7 +61,7 @@ export default function AdminTestimonials() {
 
             {showForm && (
                 <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm">
-                    <div className="min-h-full flex items-center justify-center p-4 sm:p-8">
+                    <div className="min-h-full flex items-start justify-center p-4 sm:p-8 pt-12 pb-12">
                         <form onSubmit={handleSubmit} className="bg-brushedAnthracite border border-white/10 w-full max-w-lg shadow-2xl relative my-8">
 
                             <div className="p-6 sm:p-8 border-b border-white/10 bg-white/[0.02]">
@@ -116,7 +116,7 @@ export default function AdminTestimonials() {
                     {items.map((item) => (
                         <div key={item.id} className="bg-brushedAnthracite border border-white/5 p-5 flex justify-between items-start hover:border-white/10 transition-colors">
                             <div>
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex flex-wrap items-center gap-2 mb-2">
                                     <span className="text-whiteChrome font-medium">{item.clientName}</span>
                                     {item.company && <span className="text-ashGrey text-xs">@ {item.company}</span>}
                                     <span className="text-yellow-400 text-sm">{"★".repeat(item.rating)}</span>

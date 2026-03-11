@@ -1,8 +1,11 @@
 import { MetadataRoute } from "next";
 import { WORKFLOWS } from "@/data/workflows";
+import { db } from "@/lib/db";
+import { blogPosts } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = "https://tejnavistudio.com";
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    const baseUrl = "https://tejnavistudio.vercel.app";
 
     const staticRoutes: MetadataRoute.Sitemap = [
         {
@@ -47,6 +50,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: "monthly",
             priority: 0.5,
         },
+        {
+            url: `${baseUrl}/blog`,
+            lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.8,
+        },
     ];
 
     const workflowRoutes: MetadataRoute.Sitemap = WORKFLOWS.map((workflow) => ({
@@ -56,5 +65,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.5,
     }));
 
-    return [...staticRoutes, ...workflowRoutes];
+    let dynamicBlogs: MetadataRoute.Sitemap = [];
+
+    try {
+        const publishedBlogs = await db
+            .select()
+            .from(blogPosts)
+            .where(eq(blogPosts.isPublished, true));
+
+        dynamicBlogs = publishedBlogs.map((b) => ({
+            url: `${baseUrl}/blog/${b.slug}`,
+            lastModified: b.publishedAt ? new Date(b.publishedAt) : new Date(b.createdAt),
+            changeFrequency: "weekly" as const,
+            priority: 0.8,
+        }));
+    } catch (error) {
+        console.error("Failed to fetch blogs for sitemap:", error);
+    }
+
+    return [...staticRoutes, ...workflowRoutes, ...dynamicBlogs];
 }

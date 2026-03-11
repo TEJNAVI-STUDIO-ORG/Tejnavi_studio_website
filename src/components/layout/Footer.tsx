@@ -74,7 +74,10 @@ export function Footer() {
     const docTitle = openDoc === "privacy" ? "Privacy Policy" : openDoc === "terms" ? "Terms of Service" : "";
 
     return (
-        <footer className="relative bg-matteCarbon pt-32 pb-12 px-6 border-t border-white/5 overflow-hidden noise-overlay">
+        <footer className="relative bg-[#0a0a0a] pt-32 pb-8 px-6 sm:px-12 border-t border-white/5 overflow-hidden font-sans">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-white/[0.02] rounded-full blur-[120px] pointer-events-none" />
+
             <AnimatePresence>
                 {openDoc ? (
                     <motion.div
@@ -98,7 +101,7 @@ export function Footer() {
                                 role="dialog"
                                 aria-modal="true"
                                 aria-labelledby="legal-modal-title"
-                                className="w-full max-w-3xl bg-brushedAnthracite border border-white/10 shadow-2xl flex flex-col max-h-[calc(100vh-2rem)]"
+                                className="w-full max-w-3xl bg-[#111] border border-white/10 shadow-2xl flex flex-col max-h-[calc(100vh-2rem)]"
                                 initial={{ opacity: 0, y: 40, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -293,115 +296,107 @@ export function Footer() {
                 ) : null}
             </AnimatePresence>
 
-            <div className="max-w-[85rem] mx-auto relative z-10 px-4 sm:px-12">
+            <div className="max-w-[85rem] mx-auto relative z-10">
 
-                <div className="flex flex-col lg:flex-row justify-between gap-16 lg:gap-24 mb-24">
-
-                    {/* Left side: Massive CTA */}
-                    <div className="lg:w-1/2 flex flex-col justify-start">
-                        <div className="inline-flex items-center gap-3 mb-10">
-                            <div className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-whiteChrome/40 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-whiteChrome"></span>
+                {/* Top Section: CTA */}
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-white/10 pb-20">
+                    <div className="max-w-2xl">
+                        <div className="inline-flex items-center gap-3 mb-8">
+                            <div className="relative flex h-2.5 w-2.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                             </div>
-                            <span className="text-xs font-bold uppercase tracking-widest text-ashGrey">Available for new projects</span>
+                            <span className="text-xs font-bold uppercase tracking-widest text-ashGrey">Accepting New Projects</span>
                         </div>
-
-                        <h2 className="text-5xl sm:text-6xl md:text-[5.5rem] font-heading font-bold text-whiteChrome tracking-tighter leading-[1] mb-8">
-                            LET&apos;S BUILD <br /> <span className="text-liquidSilver italic font-light">TOGETHER.</span>
+                        <h2 className="text-5xl sm:text-6xl md:text-7xl font-heading font-bold text-whiteChrome tracking-tighter leading-[1.1] mb-6">
+                            READY TO <span className="text-liquidSilver italic font-light">ELEVATE</span> YOUR BRAND?
                         </h2>
-
-                        <div className="mt-4">
-                            <Link href="/quote" className="group rounded-full bg-whiteChrome text-matteCarbon px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-whiteChrome/90 hover:scale-105 transition-all duration-300 inline-flex items-center gap-4">
-                                Start a Project
-                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-all duration-300" />
-                            </Link>
-                        </div>
                     </div>
-
-                    {/* Right side: Nav & Newsletter */}
-                    <div className="lg:w-1/2 grid grid-cols-2 gap-10 sm:gap-6 pt-4">
-
-                        {/* Navigation Links */}
-                        <div className="flex flex-col gap-6">
-                            <h4 className="text-ashGrey font-bold tracking-widest text-xs uppercase">Menu</h4>
-                            <ul className="space-y-4 text-whiteChrome/80">
-                                <li><Link href="/services" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Expertise</Link></li>
-                                <li><Link href="/projects" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Projects</Link></li>
-                                <li><Link href="/about-us" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">About Us</Link></li>
-                                <li><Link href="/blog" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Insights</Link></li>
-                                <li><Link href="/contact" className="hover:text-white transition-colors text-base hover:pl-2 duration-300">Contact</Link></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-sm">SOCIAL</h4>
-                            <ul className="space-y-4 text-ashGrey">
-                                <li>
-                                    <a
-                                        href="https://instagram.com/tejnavi.studio"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="hover:text-whiteChrome transition-colors"
-                                    >
-                                        Instagram
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="https://linkedin.com/company/tejnavi-studio"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="hover:text-whiteChrome transition-colors"
-                                    >
-                                        LinkedIn
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="https://wa.me/918459632402"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="hover:text-whiteChrome transition-colors"
-                                    >
-                                        WhatsApp
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="mailto:tejnavi.studio@gmail.com"
-                                        className="hover:text-whiteChrome transition-colors"
-                                    >
-                                        Email
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                    <div>
+                        <Link href="/quote" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full p-4 px-10 bg-whiteChrome text-matteCarbon font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:scale-105 hover:bg-white">
+                            <span className="relative z-10 flex items-center gap-3">
+                                Start a Project <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                            </span>
+                        </Link>
                     </div>
                 </div>
 
-                {/* Bottom GIANT BRAND TEXT */}
-                <div className="w-full pt-10 pb-6 flex flex-col items-center border-t border-white/10">
+                {/* Middle Section: Links & Newsletter */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 py-20">
 
-                    {/* Bottom Credits / Links */}
-                    <div className="w-full flex flex-col md:flex-row justify-between items-center text-xs text-ashGrey tracking-widest uppercase gap-6 md:gap-0 mb-16">
-                        <div className="flex flex-col md:flex-row gap-2 md:gap-8 text-center md:text-left">
-                            <p>&copy; {year} Aditya Vispute. All rights reserved.</p>
-                            <a href="mailto:adityavispute29@gmail.com" className="hover:text-white transition-colors text-ashGrey/70">
-                                adityavispute29@gmail.com
-                            </a>
-                        </div>
-                        <div className="flex space-x-6 md:space-x-12">
-                            <button type="button" onClick={() => setOpenDoc("privacy")} className="hover:text-white transition-colors underline-offset-4 hover:underline">
-                                Privacy Policy
+                    {/* Newsletter */}
+                    <div className="lg:col-span-2 pr-0 lg:pr-20">
+                        <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-xs uppercase">Stay Updated</h4>
+                        <p className="text-ashGrey text-sm mb-8 leading-relaxed max-w-md">
+                            Subscribe to our newsletter for insights on design, engineering, and digital strategy. No spam, just value.
+                        </p>
+                        <form onSubmit={handleSubscribe} className="relative max-w-md">
+                            <input
+                                type="email"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Email address"
+                                className="w-full bg-transparent border-0 border-b border-lightGrey/20 pb-4 text-whiteChrome placeholder:text-white/30 focus:ring-0 focus:border-whiteChrome transition-colors"
+                            />
+                            <button
+                                type="submit"
+                                disabled={status === "submitting"}
+                                className="absolute right-0 top-0 pb-4 text-xs font-bold uppercase tracking-widest text-whiteChrome hover:text-liquidSilver transition-colors disabled:opacity-50"
+                            >
+                                {status === "submitting" ? "Sending..." : "Subscribe"}
                             </button>
-                            <button type="button" onClick={() => setOpenDoc("terms")} className="hover:text-white transition-colors underline-offset-4 hover:underline">
-                                Terms of Service
-                            </button>
-                        </div>
+                            {status === "success" && <p className="text-xs text-green-400 mt-3 absolute">Welcome on board.</p>}
+                            {status === "error" && <p className="text-xs text-red-400 mt-3 absolute">Something went wrong.</p>}
+                        </form>
+                    </div>
+
+                    {/* Navigation */}
+                    <div>
+                        <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-xs uppercase">Navigation</h4>
+                        <ul className="space-y-4 text-ashGrey text-sm flex flex-col items-start">
+                            <li><Link href="/" className="hover:text-whiteChrome transition-colors link-underline">Home</Link></li>
+                            <li><Link href="/services" className="hover:text-whiteChrome transition-colors link-underline">Expertise</Link></li>
+                            <li><Link href="/projects" className="hover:text-whiteChrome transition-colors link-underline">Work</Link></li>
+                            <li><Link href="/about-us" className="hover:text-whiteChrome transition-colors link-underline">About Us</Link></li>
+                            <li><Link href="/blog" className="hover:text-whiteChrome transition-colors link-underline">Insights</Link></li>
+                        </ul>
+                    </div>
+
+                    {/* Social / Contact */}
+                    <div>
+                        <h4 className="text-whiteChrome font-bold mb-6 font-heading tracking-widest text-xs uppercase">Connect</h4>
+                        <ul className="space-y-4 text-ashGrey text-sm flex flex-col items-start">
+                            <li><a href="https://instagram.com/tejnavi.studio" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">Instagram</a></li>
+                            <li><a href="https://linkedin.com/company/tejnavi-studio" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">LinkedIn</a></li>
+                            <li><a href="https://twitter.com/tejnavi" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">Twitter (X)</a></li>
+                            <li><a href="mailto:tejnavi.studio@gmail.com" className="hover:text-whiteChrome transition-colors link-underline">t.studio@gmail.com</a></li>
+                            <li><a href="https://wa.me/918459632402" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">+91 8459632402</a></li>
+                        </ul>
                     </div>
 
                 </div>
+
+                {/* Bottom Section: Giant Logo & Legal */}
+                <div className="pt-10 flex flex-col items-center">
+                    {/* Legal Links & Copyright */}
+                    <div className="w-full flex flex-col md:flex-row justify-between items-center text-[10px] text-ashGrey uppercase tracking-[0.2em] mb-12 gap-6 md:gap-0">
+                        <div className="flex space-x-8">
+                            <button type="button" onClick={() => setOpenDoc("privacy")} className="hover:text-whiteChrome transition-colors">Privacy Policy</button>
+                            <button type="button" onClick={() => setOpenDoc("terms")} className="hover:text-whiteChrome transition-colors">Terms of Service</button>
+                        </div>
+                        <p>&copy; {year} Tejnavi Studio.</p>
+                        <p className="hidden md:block">Engineered by Aditya Vispute</p>
+                    </div>
+
+                    {/* Giant Brand Name */}
+                    <div className="w-full text-center overflow-hidden flex justify-center items-end opacity-20 hover:opacity-100 transition-opacity duration-1000 select-none">
+                        <h1 className="text-[12vw] sm:text-[15vw] font-heading font-black tracking-tighter text-whiteChrome leading-[0.75] w-full text-center whitespace-nowrap">
+                            TEJNAVI
+                        </h1>
+                    </div>
+                </div>
+
             </div>
         </footer>
     );

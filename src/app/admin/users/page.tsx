@@ -72,7 +72,7 @@ export default function AdminUsers() {
 
             {showForm && (
                 <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm">
-                    <div className="min-h-full flex items-center justify-center p-4 sm:p-8">
+                    <div className="min-h-full flex items-start justify-center p-4 sm:p-8 pt-12 pb-12">
                         <form onSubmit={handleSubmit} className="bg-brushedAnthracite border border-white/10 w-full max-w-md shadow-2xl relative my-8">
 
                             <div className="p-6 sm:p-8 border-b border-white/10 bg-white/[0.02]">

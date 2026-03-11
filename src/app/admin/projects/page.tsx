@@ -128,7 +128,7 @@ export default function AdminProjects() {
             {/* Form Modal */}
             {showForm && (
                 <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm">
-                    <div className="min-h-full flex items-center justify-center p-4 sm:p-8">
+                    <div className="min-h-full flex items-start justify-center p-4 sm:p-8 pt-12 pb-12">
                         <form onSubmit={handleSubmit} className="bg-brushedAnthracite border border-white/10 w-full max-w-2xl shadow-2xl relative my-8">
 
                             <div className="p-6 sm:p-8 border-b border-white/10 bg-white/[0.02]">
@@ -217,8 +217,8 @@ export default function AdminProjects() {
                     <button onClick={openCreate} className="text-sm text-whiteChrome underline">Add your first project</button>
                 </div>
             ) : (
-                <div className="bg-brushedAnthracite border border-white/5 overflow-hidden">
-                    <table className="w-full">
+                <div className="bg-brushedAnthracite border border-white/5 overflow-x-auto">
+                    <table className="w-full min-w-[700px]">
                         <thead>
                             <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-ashGrey">
                                 <th className="text-left p-4">Project</th>

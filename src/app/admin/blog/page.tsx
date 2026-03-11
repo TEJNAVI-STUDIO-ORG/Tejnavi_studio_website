@@ -203,15 +203,15 @@ export default function AdminBlog() {
             ) : (
                 <div className="space-y-3">
                     {posts.map((post) => (
-                        <div key={post.id} className="bg-brushedAnthracite border border-white/5 p-5 flex items-center justify-between hover:border-white/10 transition-colors">
+                        <div key={post.id} className="bg-brushedAnthracite border border-white/5 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-white/10 transition-colors">
                             <div className="flex-1">
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-wrap items-center gap-3">
                                     <h3 className="text-whiteChrome font-medium">{post.title}</h3>
                                     <span className={`text-xs px-2 py-0.5 ${post.isPublished ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"}`}>
                                         {post.isPublished ? "Published" : "Draft"}
                                     </span>
                                 </div>
-                                <p className="text-ashGrey text-sm mt-1">
+                                <p className="text-ashGrey text-sm mt-1 sm:mt-2">
                                     {post.category && <span className="mr-3">{post.category}</span>}
                                     {post.readTimeMinutes} min read
                                 </p>

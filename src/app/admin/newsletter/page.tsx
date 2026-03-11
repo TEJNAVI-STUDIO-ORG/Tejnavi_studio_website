@@ -28,8 +28,8 @@ export default function AdminNewsletter() {
                     <p className="text-ashGrey">No subscribers yet</p>
                 </div>
             ) : (
-                <div className="bg-brushedAnthracite border border-white/5 overflow-hidden">
-                    <table className="w-full">
+                <div className="bg-brushedAnthracite border border-white/5 overflow-x-auto">
+                    <table className="w-full min-w-[500px]">
                         <thead>
                             <tr className="border-b border-white/5 text-xs uppercase tracking-widest text-ashGrey">
                                 <th className="text-left p-4">Email</th>

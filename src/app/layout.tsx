@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     },
     description:
         "Tejnavi Studio is a premier digital product agency. We design and build world-class websites, applications, and digital experiences for ambitious brands.",
-    metadataBase: new URL("https://tejnavistudio.com"),
+    metadataBase: new URL("https://tejnavistudio.vercel.app"),
     openGraph: {
         type: "website",
         locale: "en_US",
@@ -53,6 +53,9 @@ export const metadata: Metadata = {
     creator: "Aditya Vispute",
     icons: {
         icon: "/favicon.png",
+    },
+    verification: {
+        google: "EykISw3ml9v_PQ8PCf9rIN9dm6R6p_JdPRxAl7UKe2U",
     },
 };
 

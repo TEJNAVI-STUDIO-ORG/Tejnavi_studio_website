@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const isAdminPage = pathname.startsWith("/admin");
+    const isAdminPage = pathname.toLowerCase().startsWith("/admin");
 
     const content = (
         <div className="flex flex-col min-h-screen">

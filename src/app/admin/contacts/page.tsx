@@ -67,8 +67,8 @@ export default function AdminContacts() {
                                 className={`bg-brushedAnthracite border p-5 cursor-pointer transition-all ${selected?.id === contact.id ? "border-liquidSilver" : "border-white/5 hover:border-white/10"
                                     }`}
                             >
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-2">
+                                    <div className="flex flex-wrap items-center gap-3">
                                         <span className="text-whiteChrome font-medium text-sm">{contact.name || "Anonymous"}</span>
                                         <span className={`text-xs px-2 py-0.5 ${statusColors[contact.status] || statusColors.new}`}>
                                             {contact.status}
