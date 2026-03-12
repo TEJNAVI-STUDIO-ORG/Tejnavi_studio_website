@@ -39,7 +39,6 @@ export default function WorkflowDetail() {
                             Back
                         </button>
                     </div>
-************************************************************************************************************************************************************************************************************
                     <h1 className="text-5xl md:text-7xl font-heading font-bold text-whiteChrome mb-6 mt-10">
                         BUILD <span className="text-liquidSilver italic">WORKFLOWS</span>
                     </h1>

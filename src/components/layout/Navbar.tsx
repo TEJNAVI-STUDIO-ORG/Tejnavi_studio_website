@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export function Navbar() {
     const pathname = usePathname();
@@ -14,6 +14,18 @@ export function Navbar() {
     const lastScrollY = useRef(0);
 
     const { scrollY } = useScroll();
+
+    // Lock body scroll when mobile menu is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isMobileMenuOpen]);
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         const direction = latest > lastScrollY.current ? "down" : "up";
@@ -43,15 +55,17 @@ export function Navbar() {
             initial={{ y: 0 }}
             animate={{ y: isHidden && !isMobileMenuOpen ? -100 : 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`fixed top-0 w-full z-50 px-6 py-5 transition-all duration-300 ${isScrolled
-                    ? "bg-matteCarbon/85 backdrop-blur-md border-b border-white/5"
+            className={`fixed top-0 w-full z-[100] px-6 py-5 transition-all duration-300 ${isScrolled && !isMobileMenuOpen
+                ? "bg-matteCarbon/85 backdrop-blur-md border-b border-white/5"
+                : isMobileMenuOpen
+                    ? "bg-matteCarbon" // Fully opaque when menu is open
                     : "bg-transparent"
                 }`}
         >
             <div className="max-w-[1400px] mx-auto flex justify-between items-center">
                 <Link
                     href="/"
-                    className="text-2xl font-heading font-bold tracking-tighter text-whiteChrome group relative z-50"
+                    className="text-2xl font-heading font-bold tracking-tighter text-whiteChrome group relative z-[101]"
                 >
                     TEJNAVI
                     <span className="text-liquidSilver group-hover:text-mercuryGlow transition-colors duration-200">
@@ -66,8 +80,8 @@ export function Navbar() {
                             key={link.href}
                             href={link.href}
                             className={`relative group transition-all duration-200 ${pathname === link.href
-                                    ? "text-whiteChrome"
-                                    : "hover:text-whiteChrome"
+                                ? "text-whiteChrome"
+                                : "hover:text-whiteChrome"
                                 }`}
                         >
                             {link.label}
@@ -90,20 +104,21 @@ export function Navbar() {
 
                 {/* Mobile Nav Toggle */}
                 <button
-                    className="md:hidden text-whiteChrome z-50 relative"
+                    className="md:hidden text-whiteChrome z-[101] relative"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                     {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
                 </button>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
                 <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="fixed inset-0 bg-matteCarbon z-40 flex flex-col items-center justify-center space-y-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="fixed inset-0 bg-matteCarbon z-[90] flex flex-col items-center justify-center space-y-8 h-screen w-screen"
                 >
                     {links.map((link) => (
                         <Link
