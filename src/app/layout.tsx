@@ -67,7 +67,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
-            className={`${inter.variable} ${manrope.variable} ${spaceGrotesk.variable} dark`}
+            className={`${inter.variable} ${manrope.variable} ${spaceGrotesk.variable}`}
             suppressHydrationWarning
         >
             <body className="selection:bg-whiteChrome selection:text-matteCarbon">

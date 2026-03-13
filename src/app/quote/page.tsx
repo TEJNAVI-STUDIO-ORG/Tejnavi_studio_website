@@ -7,7 +7,7 @@ import { Counter } from "@/components/ui/Counter";
 import { useToast } from "@/hooks/use-toast";
 
 // Exchange rate: 1 USD ≈ 85 INR
-const INR_RATE = 85;
+const INR_RATE = 92;
 
 const SERVICE_TYPES = [
     { id: "web", label: "Website", basePrice: 800 },

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *), html.dark &);
 
 @theme inline {
   --color-background: hsl(var(--background));
@@ -24,17 +24,17 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
-  /* Tejnavi Custom Palette */
-  --color-matteCarbon: #0F0F0F;
-  --color-brushedAnthracite: #1A1A1A;
-  --color-elevatedCharcoal: #1E1E1E;
-  --color-gunmetal: #333333;
-  --color-frostWhite: #F5F5F5;
-  --color-ashGrey: #A1A1AA;
-  --color-chromeSilver: #D4D4D8;
-  --color-whiteChrome: #FFFFFF;
-  --color-liquidSilver: #C0C0C0;
-  --color-mercuryGlow: #E5E5E5;
+  /* Tejnavi Custom Palette — mapped to CSS vars for theme switching */
+  --color-matteCarbon: var(--palette-bg);
+  --color-brushedAnthracite: var(--palette-surface);
+  --color-elevatedCharcoal: var(--palette-elevated);
+  --color-gunmetal: var(--palette-border);
+  --color-frostWhite: var(--palette-frost);
+  --color-ashGrey: var(--palette-muted);
+  --color-chromeSilver: var(--palette-chrome);
+  --color-whiteChrome: var(--palette-fg);
+  --color-liquidSilver: var(--palette-silver);
+  --color-mercuryGlow: var(--palette-glow);
 
   --font-sans: 'Inter', 'Manrope', sans-serif;
   --font-heading: 'Space Grotesk', sans-serif;
@@ -176,47 +176,78 @@
   }
 }
 
-:root {
-  /* Matte Carbon */
+/* ── Dark mode theme tokens (default) ── */
+:root,
+.dark {
+  /* shadcn tokens */
   --background: 0 0% 6%;
-  /* Frost White */
   --foreground: 0 0% 96%;
-
-  /* Brushed Anthracite */
   --card: 0 0% 10%;
   --card-foreground: 0 0% 96%;
-
   --popover: 0 0% 10%;
   --popover-foreground: 0 0% 96%;
-
-  /* White Chrome */
   --primary: 0 0% 100%;
-  /* Matte Carbon */
   --primary-foreground: 0 0% 6%;
-
-  /* Elevated Charcoal */
   --secondary: 0 0% 12%;
-  /* Ash Grey */
   --secondary-foreground: 240 5% 65%;
-
-  /* Gunmetal */
   --muted: 0 0% 20%;
-  /* Ash Grey */
   --muted-foreground: 240 5% 65%;
-
-  /* Liquid Silver */
   --accent: 0 0% 75%;
-  /* Matte Carbon */
   --accent-foreground: 0 0% 6%;
-
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 96%;
-
-  /* Gunmetal */
   --border: 0 0% 20%;
   --input: 0 0% 20%;
   --ring: 0 0% 75%;
   --radius: 0.5rem;
+
+  /* Tejnavi palette tokens — dark */
+  --palette-bg: #0F0F0F;
+  --palette-surface: #1A1A1A;
+  --palette-elevated: #1E1E1E;
+  --palette-border: #333333;
+  --palette-frost: #F5F5F5;
+  --palette-muted: #A1A1AA;
+  --palette-chrome: #D4D4D8;
+  --palette-fg: #FFFFFF;
+  --palette-silver: #C0C0C0;
+  --palette-glow: #E5E5E5;
+}
+
+/* ── Light mode theme tokens ── */
+:root:not(.dark) {
+  /* shadcn tokens */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 6%;
+  --card: 0 0% 97%;
+  --card-foreground: 0 0% 6%;
+  --popover: 0 0% 97%;
+  --popover-foreground: 0 0% 6%;
+  --primary: 0 0% 6%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 93%;
+  --secondary-foreground: 0 0% 25%;
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 0 0% 35%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 82%;
+  --input: 0 0% 82%;
+  --ring: 0 0% 30%;
+
+  /* Tejnavi palette tokens — light */
+  --palette-bg: #FFFFFF;
+  --palette-surface: #F5F5F5;
+  --palette-elevated: #EFEFEF;
+  --palette-border: #D4D4D8;
+  --palette-frost: #0F0F0F;
+  --palette-muted: #71717A;
+  --palette-chrome: #52525B;
+  --palette-fg: #0F0F0F;
+  --palette-silver: #555555;
+  --palette-glow: #1A1A1A;
 }
 
 /* Dark mode uses same tokens as root since we default to dark */
