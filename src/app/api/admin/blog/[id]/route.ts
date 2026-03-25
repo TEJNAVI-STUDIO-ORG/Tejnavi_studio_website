@@ -11,13 +11,17 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
+
+        // Omit date fields that come from the frontend as strings
+        const { id: _bodyId, createdAt, updatedAt, publishedAt, ...rest } = body;
+
         const updateData: any = {
-            ...body,
+            ...rest,
             updatedAt: new Date(),
         };
 
-        if (body.publishedAt) {
-            updateData.publishedAt = new Date(body.publishedAt);
+        if (publishedAt) {
+            updateData.publishedAt = new Date(publishedAt);
         } else if (body.isPublished === true) {
             updateData.publishedAt = new Date();
         } else if (body.isPublished === false) {

@@ -1,19 +1,16 @@
-export const dynamic = "force-dynamic";
-
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Our Expertise & Services",
-    description:
-        "End-to-end digital product engineering — web development, mobile apps, SaaS platforms, UI/UX design, AI automation, SEO, and more. Tejnavi Studio delivers world-class quality.",
+    title: "Services & Expertise | Tejnavi Studio",
+    description: "End-to-end digital product engineering. We specialize in Website Development, Web Apps, SaaS, Mobile Apps, UI/UX Design, and more.",
     openGraph: {
-        title: "Our Expertise & Services | Tejnavi Studio",
-        description:
-            "End-to-end digital product engineering — web development, mobile apps, SaaS platforms, UI/UX design, AI automation, and more.",
-        images: [{ url: "/banner.png" }],
+        title: "Services & Expertise | Tejnavi Studio",
+        description: "End-to-end digital product engineering. We specialize in Website Development, Web Apps, SaaS, Mobile Apps, UI/UX Design, and more.",
+        url: "https://tejnavistudio.vercel.app/services",
+        siteName: "Tejnavi Studio",
     },
 };
 
 export default function ServicesLayout({ children }: { children: React.ReactNode }) {
-    return children;
+    return <>{children}</>;
 }

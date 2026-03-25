@@ -1,19 +1,16 @@
-export const dynamic = "force-dynamic";
-
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Selected Work & Portfolio",
-    description:
-        "Explore our portfolio of world-class websites, web applications, SaaS platforms, and mobile apps built for ambitious brands by Tejnavi Studio.",
+    title: "Our Work & Portfolio | Tejnavi Studio",
+    description: "Explore our selected projects across Web, Mobile, SaaS, E-commerce, and Custom CRM solutions built for modern businesses.",
     openGraph: {
-        title: "Selected Work & Portfolio | Tejnavi Studio",
-        description:
-            "Explore our portfolio of premium digital products built for ambitious brands.",
-        images: [{ url: "/banner.png" }],
+        title: "Our Work & Portfolio | Tejnavi Studio",
+        description: "Explore our selected projects across Web, Mobile, SaaS, E-commerce, and Custom CRM solutions built for modern businesses.",
+        url: "https://tejnavistudio.vercel.app/projects",
+        siteName: "Tejnavi Studio",
     },
 };
 
 export default function ProjectsLayout({ children }: { children: React.ReactNode }) {
-    return children;
+    return <>{children}</>;
 }
