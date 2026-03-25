@@ -11,11 +11,18 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
-        const updateData = {
+        const updateData: any = {
             ...body,
             updatedAt: new Date(),
-            publishedAt: body.publishedAt ? new Date(body.publishedAt) : undefined,
         };
+
+        if (body.publishedAt) {
+            updateData.publishedAt = new Date(body.publishedAt);
+        } else if (body.isPublished === true) {
+            updateData.publishedAt = new Date();
+        } else if (body.isPublished === false) {
+            updateData.publishedAt = null;
+        }
         const [updated] = await db
             .update(blogPosts)
             .set(updateData)
