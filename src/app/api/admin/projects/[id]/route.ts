@@ -14,8 +14,13 @@ export async function PUT(
         const { id } = await params;
         const body = await request.json();
 
+        // Strip fields the client may echo back that drizzle can't accept:
+        //   - id / createdAt / updatedAt come from the DB as ISO strings; drizzle
+        //     calls .toISOString() on Date columns and crashes on strings.
+        const { id: _bodyId, createdAt, updatedAt, ...rest } = body;
+
         // Strip empty strings from optional fields — we want NULL in DB, not "".
-        const cleaned = { ...body };
+        const cleaned: Record<string, unknown> = { ...rest };
         for (const key of ["subtitle", "description", "thumbnailUrl", "caseStudyUrl", "repoUrl", "liveUrl"]) {
             if (cleaned[key] === "") cleaned[key] = null;
         }
