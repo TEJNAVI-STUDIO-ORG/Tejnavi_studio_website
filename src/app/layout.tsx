@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, Space_Grotesk } from "next/font/google";
+import { Inter, Manrope, Space_Grotesk, Syne } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ClientShell } from "@/components/layout/ClientShell";
@@ -22,6 +22,13 @@ const spaceGrotesk = Space_Grotesk({
     subsets: ["latin"],
     variable: "--font-heading",
     weight: ["300", "400", "500", "600", "700"],
+    display: "swap",
+});
+
+const syne = Syne({
+    subsets: ["latin"],
+    variable: "--font-display",
+    weight: ["700", "800"],
     display: "swap",
 });
 
@@ -49,8 +56,8 @@ export const metadata: Metadata = {
             "Premier digital product agency delivering world-class websites, applications, and digital experiences.",
         images: ["/banner.png"],
     },
-    authors: [{ name: "Aditya Vispute" }],
-    creator: "Aditya Vispute",
+    authors: [{ name: "Tejnavi Studio" }],
+    creator: "Tejnavi Studio",
     icons: {
         icon: "/favicon.png",
     },
@@ -67,8 +74,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
-            className={`${inter.variable} ${manrope.variable} ${spaceGrotesk.variable}`}
-            suppressHydrationWarning
+            className={`${inter.variable} ${manrope.variable} ${spaceGrotesk.variable} ${syne.variable}`}
         >
             <body className="selection:bg-whiteChrome selection:text-matteCarbon">
                 <div className="noise-overlay" />

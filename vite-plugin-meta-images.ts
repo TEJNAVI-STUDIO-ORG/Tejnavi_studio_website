@@ -1,4 +1,4 @@
-// This file is owned and maintained by Aditya Vispute.
+// This file is owned and maintained by Tejnavi Studio.
 // All rights reserved.
 
 import type { Plugin } from 'vite';

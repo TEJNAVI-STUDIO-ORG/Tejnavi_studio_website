@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *), html.dark &);
+@custom-variant dark (&);
 
 @theme inline {
   --color-background: hsl(var(--background));
@@ -35,13 +35,17 @@
   --color-whiteChrome: var(--palette-fg);
   --color-liquidSilver: var(--palette-silver);
   --color-mercuryGlow: var(--palette-glow);
+  --color-accentLime: #C5F258;
+  --color-accentLimeDim: rgba(197, 242, 88, 0.1);
+  --color-accentLimeGlow: rgba(197, 242, 88, 0.3);
 
   --font-sans: 'Inter', 'Manrope', sans-serif;
   --font-heading: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
+  --font-display: 'Syne', 'Space Grotesk', sans-serif;
 
-  --animate-marquee: marquee 25s linear infinite;
-  --animate-marquee-reverse: marquee-reverse 25s linear infinite;
+  --animate-marquee: marquee 20s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 20s linear infinite;
   --animate-float: float 6s ease-in-out infinite;
   --animate-grain: grain 8s steps(10) infinite;
   --animate-projects-marquee: projects-marquee 40s linear infinite;
@@ -84,7 +88,7 @@
     }
 
     50% {
-      transform: translateY(-20px);
+      transform: translateY(-10px);
     }
   }
 
@@ -172,13 +176,12 @@
   }
 
   50% {
-    transform: translateY(-20px);
+    transform: translateY(-10px);
   }
 }
 
-/* ── Dark mode theme tokens (default) ── */
-:root,
-.dark {
+/* ── Theme tokens (dark-only) ── */
+:root {
   /* shadcn tokens */
   --background: 0 0% 6%;
   --foreground: 0 0% 96%;
@@ -201,8 +204,8 @@
   --ring: 0 0% 75%;
   --radius: 0.5rem;
 
-  /* Tejnavi palette tokens — dark */
-  --palette-bg: #0F0F0F;
+  /* Tejnavi palette tokens — dark (Noir) */
+  --palette-bg: #080808;
   --palette-surface: #1A1A1A;
   --palette-elevated: #1E1E1E;
   --palette-border: #333333;
@@ -214,43 +217,6 @@
   --palette-glow: #E5E5E5;
 }
 
-/* ── Light mode theme tokens ── */
-:root:not(.dark) {
-  /* shadcn tokens */
-  --background: 0 0% 100%;
-  --foreground: 0 0% 6%;
-  --card: 0 0% 97%;
-  --card-foreground: 0 0% 6%;
-  --popover: 0 0% 97%;
-  --popover-foreground: 0 0% 6%;
-  --primary: 0 0% 6%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 93%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 0 0% 90%;
-  --muted-foreground: 0 0% 40%;
-  --accent: 0 0% 35%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 72% 45%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 82%;
-  --input: 0 0% 82%;
-  --ring: 0 0% 30%;
-
-  /* Tejnavi palette tokens — light */
-  --palette-bg: #FFFFFF;
-  --palette-surface: #F5F5F5;
-  --palette-elevated: #EFEFEF;
-  --palette-border: #D4D4D8;
-  --palette-frost: #0F0F0F;
-  --palette-muted: #71717A;
-  --palette-chrome: #52525B;
-  --palette-fg: #0F0F0F;
-  --palette-silver: #555555;
-  --palette-glow: #1A1A1A;
-}
-
-/* Dark mode uses same tokens as root since we default to dark */
 
 html {
   scroll-behavior: smooth;
@@ -268,14 +234,24 @@ html {
     @apply font-sans antialiased;
   }
 
-  /* Hide scrollbar for cleaner look */
+  /* Custom Scrollbar — Stitch Noir */
   ::-webkit-scrollbar {
-    display: none;
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #080808;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #353534;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #c5f258;
   }
 
   body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: #353534 #080808;
   }
 
   h1,
@@ -301,9 +277,6 @@ html {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-.dark .noise-overlay {
-  opacity: 0.04;
-}
 
 /* Mesh Gradient utility */
 .mesh-gradient {
@@ -318,6 +291,22 @@ html {
   background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
+}
+
+/* High-Performance Noir Outline Utility */
+.noir-outline {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Hover Glow Effect */
+.hover-glow:hover {
+  box-shadow: 0 0 40px rgba(197, 242, 88, 0.1);
+}
+
+/* Selection Colors — lime accent */
+::selection {
+  background-color: #c5f258;
+  color: #080808;
 }
 
 /* Accessibility: Disable animations for users who prefer reduced motion */

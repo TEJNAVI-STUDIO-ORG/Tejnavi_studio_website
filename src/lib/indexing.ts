@@ -153,14 +153,11 @@ export async function notifySearchEngines(
     if (GOOGLE_INDEXING_ENABLED) {
         tasks.push(notifyGoogleIndexing(list, type).then((r) => console.log("[indexing] Google:", r)));
     }
-    // NOTE: Google removed the sitemap ping endpoint in June 2023.
-    // Bing still accepts it. Yandex accepts it. Google now uses IndexNow signals
-    // (via the Google Indexing API when configured) + sitemap crawling.
-    tasks.push(
-        fetch(`https://www.bing.com/ping?sitemap=${encodeURIComponent(`${SITE_URL}/sitemap.xml`)}`)
-            .then((r) => console.log("[indexing] Bing sitemap ping:", r.status))
-            .catch(() => undefined)
-    );
+    // NOTE: Both Google (June 2023) and Bing (May 2025) deprecated their
+    // sitemap ping endpoints — they now return 4xx. We rely on:
+    //   • IndexNow for Bing/Yandex/Seznam (instant URL push above)
+    //   • Google Indexing API for Google (direct URL notification above)
+    //   • sitemap.xml itself, which crawlers re-fetch on their own schedule
 
     await Promise.allSettled(tasks);
 }

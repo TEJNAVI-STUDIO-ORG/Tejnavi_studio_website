@@ -43,8 +43,8 @@ const SOCIAL_LINKS = [
     },
     {
         name: "Email",
-        handle: "adityavispute29@gmail.com",
-        href: "mailto:adityavispute29@gmail.com",
+        handle: "tejnavi.studio@gmail.com",
+        href: "mailto:tejnavi.studio@gmail.com",
         icon: Mail,
         hoverBg: "group-hover:bg-white/5 group-hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]",
         borderColor: "border-white/5 group-hover:border-white/20",
