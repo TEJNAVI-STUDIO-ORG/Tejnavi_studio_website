@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
@@ -324,11 +325,13 @@ function WorkSection({ projects }: { projects: FeaturedProject[] }) {
                                 <Link href={`/projects/${project.slug}`} className="group cursor-pointer block">
                                     <div className={`noir-outline overflow-hidden rounded-sm bg-[#131313] ${isWide ? "aspect-[16/10]" : "aspect-[4/5]"} relative`}>
                                         <div className="absolute inset-0 bg-[#353534] mix-blend-multiply opacity-50 z-10 transition-opacity group-hover:opacity-20" />
-                                        <img
+                                        <Image
                                             src={project.imageUrl}
                                             alt={project.title}
-                                            loading={i < 2 ? "eager" : "lazy"}
-                                            className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
+                                            fill
+                                            sizes={isWide ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
+                                            priority={i < 2}
+                                            className="object-cover transform transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
                                         />
                                         <div className="absolute inset-0 z-20 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-3 group-hover:translate-y-0">
                                             <span className="bg-accentLime text-[#080808] font-bold uppercase text-[11px] tracking-[0.1em] px-5 py-2.5 rounded-sm hover:bg-white transition-colors">
