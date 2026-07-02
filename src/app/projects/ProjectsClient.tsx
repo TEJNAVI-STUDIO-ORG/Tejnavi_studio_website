@@ -68,30 +68,27 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: P
                                             />
                                         )}
                                         <div className="absolute inset-0 bg-matteCarbon/40 group-hover:bg-matteCarbon/10 transition-colors duration-500"></div>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
-                                            {project.caseStudyUrl ? (
-                                                <a href={project.caseStudyUrl} target="_blank" rel="noopener noreferrer" className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors">
-                                                    View Case Study
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-matteCarbon/40 backdrop-blur-sm z-10">
+                                            {/* Case Study — internal SEO-friendly detail page */}
+                                            <Link
+                                                href={`/projects/${project.slug}`}
+                                                className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors"
+                                            >
+                                                View Case Study
+                                            </Link>
+                                            {project.liveUrl && (
+                                                <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-whiteChrome text-xs uppercase tracking-widest hover:text-liquidSilver transition-colors">
+                                                    Live Preview ↗
                                                 </a>
-                                            ) : project.liveUrl ? (
-                                                <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors">
-                                                    Live Preview
-                                                </a>
-                                            ) : project.repoUrl ? (
-                                                <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="text-whiteChrome font-bold uppercase tracking-widest border border-whiteChrome px-6 py-3 rounded-full hover:bg-whiteChrome hover:text-matteCarbon transition-colors">
-                                                    View Code
-                                                </a>
-                                            ) : (
-                                                <span className="text-whiteChrome font-bold uppercase tracking-widest border border-white/20 px-6 py-3 rounded-full">
-                                                    Coming Soon
-                                                </span>
                                             )}
                                         </div>
                                     </div>
 
                                     <div className="flex justify-between items-start mt-4">
                                         <div>
-                                            <h3 className="text-2xl font-heading font-bold text-whiteChrome mb-1">{project.title}</h3>
+                                            <Link href={`/projects/${project.slug}`} className="block">
+                                                <h3 className="text-2xl font-heading font-bold text-whiteChrome mb-1 hover:text-liquidSilver transition-colors">{project.title}</h3>
+                                            </Link>
                                             <p className="text-ashGrey text-sm">{project.tech}</p>
                                         </div>
                                         <div className="text-right">

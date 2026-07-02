@@ -2,14 +2,8 @@
 
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useRef, useEffect, useState } from "react";
 import { PROJECTS } from "@/data/projects";
-
-const Hero3D = dynamic(
-    () => import("@/components/home/Hero3D").then((mod) => mod.Hero3D),
-    { ssr: false }
-);
 
 /* ── Count-Up Number Component ── */
 function CountUp({ value, suffix = "", duration = 2000 }: { value: number; suffix?: string; duration?: number }) {
@@ -38,6 +32,89 @@ function CountUp({ value, suffix = "", duration = 2000 }: { value: number; suffi
         <span ref={ref}>
             {display.toLocaleString()}{suffix}
         </span>
+    );
+}
+
+/* ── Typewriter Component ── */
+function TypewriterEffect({ words }: { words: string[] }) {
+    const [wordIndex, setWordIndex] = useState(0);
+    const [text, setText] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
+    
+    useEffect(() => {
+        const currentWord = words[wordIndex];
+        const typingSpeed = isDeleting ? 40 : 100; // Fast delete, normal type
+        
+        const timeout = setTimeout(() => {
+            if (!isDeleting) {
+                setText(currentWord.substring(0, text.length + 1));
+                if (text.length === currentWord.length) {
+                    setTimeout(() => setIsDeleting(true), 2500); // Pause when word is fully typed
+                }
+            } else {
+                setText(currentWord.substring(0, text.length - 1));
+                if (text.length === 0) {
+                    setIsDeleting(false);
+                    setWordIndex((prev) => (prev + 1) % words.length);
+                }
+            }
+        }, typingSpeed);
+        
+        return () => clearTimeout(timeout);
+    }, [text, isDeleting, wordIndex, words]);
+    
+    return (
+        <span className="inline-block text-liquidSilver ml-2 min-w-[280px] md:min-w-[450px] lg:min-w-[600px] text-left">
+            {text}
+            <span className="inline-block w-4 md:w-6 h-12 md:h-20 lg:h-24 bg-whiteChrome ml-2 animate-[pulse_1s_ease-in-out_infinite] translate-y-2 md:translate-y-4" />
+        </span>
+    );
+}
+
+function HeroSection() {
+    return (
+        <div className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden pt-20">
+            {/* Subtle Gradient Glow in Center */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--color-whiteChrome)_0%,transparent_100%)] opacity-[0.03] pointer-events-none" />
+
+            <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 text-center flex flex-col items-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    className="mb-8 w-full flex flex-col items-center justify-center"
+                >
+                    <h1 className="font-heading text-5xl md:text-7xl lg:text-[6.5rem] font-bold tracking-[-0.04em] text-whiteChrome leading-[1.2] md:leading-[1.1]">
+                        WE ENGINEER
+                        <br />
+                        <TypewriterEffect words={["DIGITAL EXPERIENCES.", "SCALABLE SAAS.", "MODERN FINTECH.", "THE FUTURE."]} />
+                    </h1>
+                </motion.div>
+
+                <motion.p
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.7, delay: 0.3 }}
+                    className="font-[var(--font-body)] text-ashGrey text-lg md:text-xl max-w-2xl mx-auto mb-12 font-light tracking-wide leading-relaxed"
+                >
+                    Premium digital craftsmanship engineered for high-growth enterprises
+                    and visionary brands.
+                </motion.p>
+
+                <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.7, delay: 0.5 }}
+                >
+                    <Link
+                        href="/quote"
+                        className="inline-block relative z-10 bg-whiteChrome text-matteCarbon px-10 py-5 font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:bg-liquidSilver hover:scale-105"
+                    >
+                        Get a Quote
+                    </Link>
+                </motion.div>
+            </div>
+        </div>
     );
 }
 
@@ -103,18 +180,22 @@ const STATS = [
 
 export default function Home() {
     return (
-        <div className="bg-matteCarbon">
+        <div className="w-full">
             {/* ═══════════ Hero Section ═══════════ */}
-            <Hero3D />
+            <HeroSection />
 
-            {/* ═══════════ Dual-Direction Ticker ═══════════ */}
-            <div className="overflow-hidden py-10 border-y border-white/5 space-y-4">
+            {/* ═══════════ Dual-Direction Ticker (Outline Style) ═══════════ */}
+            <div className="overflow-hidden py-16 border-y border-whiteChrome/10 space-y-6">
                 {/* Row 1: scrolls left */}
                 <div className="flex animate-marquee whitespace-nowrap">
                     {[...MARQUEE, ...MARQUEE].map((word, i) => (
                         <span
                             key={`l-${i}`}
-                            className="mx-10 text-3xl md:text-5xl font-heading font-bold text-white/[0.06] tracking-tighter select-none"
+                            className="mx-10 text-5xl md:text-7xl font-heading font-black tracking-tighter select-none"
+                            style={{
+                                WebkitTextStroke: "1px var(--color-whiteChrome)",
+                                WebkitTextFillColor: "transparent",
+                            }}
                         >
                             {word}
                         </span>
@@ -125,7 +206,12 @@ export default function Home() {
                     {[...MARQUEE, ...MARQUEE].map((word, i) => (
                         <span
                             key={`r-${i}`}
-                            className="mx-10 text-3xl md:text-5xl font-heading font-bold text-white/[0.04] tracking-tighter select-none"
+                            className="mx-10 text-5xl md:text-7xl font-heading font-black tracking-tighter select-none"
+                            style={{
+                                WebkitTextStroke: "1px var(--color-whiteChrome)",
+                                WebkitTextFillColor: "transparent",
+                                opacity: 0.5
+                            }}
                         >
                             {word}
                         </span>
@@ -140,7 +226,7 @@ export default function Home() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="mb-20"
+                        className="mb-20 text-center md:text-left"
                     >
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-whiteChrome tracking-tight">
                             CORE{" "}
@@ -156,15 +242,15 @@ export default function Home() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, margin: "-80px" }}
                                 transition={{ delay: i * 0.08 }}
-                                className="group p-8 border border-white/5 bg-brushedAnthracite hover:bg-mercuryGlow transition-all duration-500"
+                                className="group p-8 border border-whiteChrome/10 bg-brushedAnthracite hover:bg-mercuryGlow transition-all duration-500"
                             >
-                                <div className="text-sm font-heading font-bold text-liquidSilver/40 group-hover:text-matteCarbon/30 mb-6 tracking-widest transition-colors">
+                                <div className="text-sm font-heading font-bold text-liquidSilver/60 group-hover:text-matteCarbon/50 mb-6 tracking-widest transition-colors">
                                     {cap.num}
                                 </div>
                                 <h3 className="text-xl font-heading font-bold text-whiteChrome group-hover:text-matteCarbon mb-3 transition-colors">
                                     {cap.title}
                                 </h3>
-                                <p className="font-[var(--font-body)] text-ashGrey group-hover:text-matteCarbon/70 text-sm font-light leading-relaxed transition-colors">
+                                <p className="font-[var(--font-body)] text-ashGrey group-hover:text-matteCarbon/80 text-sm font-light leading-relaxed transition-colors">
                                     {cap.description}
                                 </p>
                             </motion.div>
@@ -174,7 +260,7 @@ export default function Home() {
             </section>
 
             {/* ═══════════ Stats — Dark bordered cards ═══════════ */}
-            <section className="py-24 px-6 border-y border-white/5 bg-matteCarbon">
+            <section className="py-24 px-6 border-y border-whiteChrome/10 bg-matteCarbon">
                 <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
                     {STATS.map((stat, i) => (
                         <motion.div
@@ -183,7 +269,7 @@ export default function Home() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="text-center border border-white/[0.08] bg-brushedAnthracite p-8"
+                            className="text-center border border-whiteChrome/5 bg-brushedAnthracite p-8 hover:border-whiteChrome/20 transition-colors duration-300"
                         >
                             <div className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-whiteChrome mb-3">
                                 <CountUp value={stat.value} suffix={stat.suffix} />
@@ -228,7 +314,7 @@ export default function Home() {
                     {[...PROJECTS, ...PROJECTS].map((project, i) => (
                         <div
                             key={`${project.id}-${i}`}
-                            className="group relative flex-shrink-0 w-[85vw] sm:w-[400px] md:w-[480px] aspect-[4/3] rounded-xl overflow-hidden bg-brushedAnthracite"
+                            className="group relative flex-shrink-0 w-[85vw] sm:w-[400px] md:w-[480px] aspect-[4/3] rounded-xl overflow-hidden bg-brushedAnthracite border border-whiteChrome/5"
                         >
                             {/* Image (Full cover) */}
                             <img
@@ -248,7 +334,7 @@ export default function Home() {
                                         href={project.caseStudyUrl}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="px-6 py-2.5 rounded-full border border-white/70 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-black/20"
+                                        className="px-6 py-2.5 rounded-full border border-whiteChrome/70 text-whiteChrome text-xs font-bold uppercase tracking-widest hover:bg-whiteChrome hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-matteCarbon/40"
                                     >
                                         View Case Study
                                     </a>
@@ -258,7 +344,7 @@ export default function Home() {
                                         href={project.repoUrl}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="px-6 py-2.5 rounded-full border border-white/70 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-black/20"
+                                        className="px-6 py-2.5 rounded-full border border-whiteChrome/70 text-whiteChrome text-xs font-bold uppercase tracking-widest hover:bg-whiteChrome hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-matteCarbon/40"
                                     >
                                         View Repo
                                     </a>
@@ -268,7 +354,7 @@ export default function Home() {
                                         href={project.liveUrl}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="px-6 py-2.5 rounded-full border border-white/70 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-black/20"
+                                        className="px-6 py-2.5 rounded-full border border-whiteChrome/70 text-whiteChrome text-xs font-bold uppercase tracking-widest hover:bg-whiteChrome hover:text-matteCarbon transition-all duration-200 backdrop-blur-sm bg-matteCarbon/40"
                                     >
                                         Live Preview
                                     </a>
@@ -280,7 +366,7 @@ export default function Home() {
                                 <div className="text-xs text-liquidSilver/80 font-[var(--font-body)] mb-2 tracking-widest uppercase">{project.year}</div>
                                 <h3 className="text-xl md:text-2xl font-heading font-bold text-whiteChrome mb-1 tracking-tight">{project.title}</h3>
                                 {project.subtitle && (
-                                    <p className="text-xs md:text-sm font-[var(--font-body)] text-ashGrey tracking-wide">{project.subtitle}</p>
+                                    <p className="text-xs md:text-sm font-[var(--font-body)] text-whiteChrome/80 tracking-wide">{project.subtitle}</p>
                                 )}
                             </div>
                         </div>
@@ -296,8 +382,6 @@ export default function Home() {
                     </Link>
                 </div>
             </section>
-
-
         </div>
     );
 }

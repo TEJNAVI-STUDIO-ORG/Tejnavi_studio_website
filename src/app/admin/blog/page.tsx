@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { toast } from "sonner";
 
 // Dynamic import to avoid SSR crash — MDEditor is browser-only
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
@@ -76,46 +77,66 @@ export default function AdminBlog() {
     e.preventDefault();
     setSubmitting(true);
 
-    let coverImageUrl = form.coverImageUrl;
-    if (imageFile) {
-      const formData = new FormData();
-      formData.append("file", imageFile);
-      formData.append("folder", "tejnavi-studio/blog");
-      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-      if (uploadRes.ok) {
+    try {
+      let coverImageUrl = form.coverImageUrl;
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("file", imageFile);
+        formData.append("folder", "tejnavi-studio/blog");
+        const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json().catch(() => ({}));
+          throw new Error(err?.error || "Image upload failed");
+        }
         const data = await uploadRes.json();
         coverImageUrl = data.url;
       }
-    }
 
-    const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
-    const slug =
-      form.slug ||
-      form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    const payload = { ...form, coverImageUrl, tags, slug };
+      const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
+      const slug =
+        form.slug ||
+        form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+      const payload = { ...form, coverImageUrl, tags, slug };
 
-    if (editing) {
-      await fetch(`/api/admin/blog/${editing.id}`, {
-        method: "PUT",
+      const url = editing ? `/api/admin/blog/${editing.id}` : "/api/admin/blog";
+      const method = editing ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-    } else {
-      await fetch("/api/admin/blog", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    }
 
-    setSubmitting(false);
-    setShowForm(false);
-    fetchPosts();
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || `Request failed (${res.status})`);
+      }
+
+      toast.success(
+        editing
+          ? "Post updated" + (form.isPublished ? " — Search engines pinged" : "")
+          : form.isPublished
+            ? "Post published — Google/Bing notified"
+            : "Draft saved"
+      );
+      setShowForm(false);
+      fetchPosts();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong";
+      toast.error(message);
+      console.error("Blog save failed:", error);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function handleDelete(id: number) {
     if (!confirm("Delete this blog post?")) return;
-    await fetch(`/api/admin/blog/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/admin/blog/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      toast.error("Failed to delete post");
+      return;
+    }
+    toast.success("Post deleted");
     fetchPosts();
   }
 

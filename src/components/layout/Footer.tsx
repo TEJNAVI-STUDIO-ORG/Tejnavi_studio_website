@@ -371,7 +371,7 @@ export function Footer() {
                             <li><a href="https://linkedin.com/company/tejnavi-studio" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">LinkedIn</a></li>
                             <li><a href="https://twitter.com/tejnavi" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">Twitter (X)</a></li>
                             <li><a href="mailto:tejnavi.studio@gmail.com" className="hover:text-whiteChrome transition-colors link-underline">t.studio@gmail.com</a></li>
-                            <li><a href="https://wa.me/918459632402" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">+91 8459632402</a></li>
+                            <li><a href="https://wa.me/919219271405" target="_blank" rel="noopener noreferrer" className="hover:text-whiteChrome transition-colors link-underline">+91 9219271405</a></li>
                         </ul>
                     </div>
 
@@ -386,14 +386,7 @@ export function Footer() {
                             <button type="button" onClick={() => setOpenDoc("terms")} className="hover:text-whiteChrome transition-colors">Terms of Service</button>
                         </div>
                         <p>&copy; {year} Tejnavi Studio.</p>
-                        <p className="hidden md:block">Engineered by Aditya Vispute</p>
-                    </div>
-
-                    {/* Giant Brand Name */}
-                    <div className="w-full text-center overflow-hidden flex justify-center items-end opacity-20 hover:opacity-100 transition-opacity duration-1000 select-none">
-                        <h1 className="text-[12vw] sm:text-[15vw] font-heading font-black tracking-tighter text-whiteChrome leading-[0.75] w-full text-center whitespace-nowrap">
-                            TEJNAVI
-                        </h1>
+                        <p className="hidden md:block">Engineered by Tejnavi Studio</p>
                     </div>
                 </div>
 

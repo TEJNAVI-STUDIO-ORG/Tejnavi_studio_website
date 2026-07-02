@@ -71,12 +71,13 @@ export function Navbar() {
             initial={{ y: 0 }}
             animate={{ y: isHidden && !isMobileMenuOpen ? -100 : 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`fixed top-0 w-full z-[100] px-6 py-5 transition-all duration-300 ${isScrolled && !isMobileMenuOpen
-                    ? "bg-matteCarbon/85 backdrop-blur-md border-b border-whiteChrome/5"
+            className={`fixed top-0 w-full z-[100] px-6 py-4 transition-all duration-300 ${
+                isScrolled && !isMobileMenuOpen
+                    ? "bg-matteCarbon/70 backdrop-blur-xl border-b border-whiteChrome/10"
                     : isMobileMenuOpen
                         ? "bg-matteCarbon"
                         : "bg-transparent"
-                }`}
+            }`}
         >
             <div className="max-w-[1400px] mx-auto flex justify-between items-center">
                 <Link
@@ -84,52 +85,55 @@ export function Navbar() {
                     className="text-2xl font-heading font-bold tracking-tighter text-whiteChrome group relative z-[101]"
                 >
                     TEJNAVI
-                    <span className="text-liquidSilver group-hover:text-mercuryGlow transition-colors duration-200">
+                    <span className="text-liquidSilver opacity-50 group-hover:opacity-100 transition-opacity duration-200">
                         .
                     </span>
                 </Link>
 
                 {/* Desktop Nav */}
-                <div className="hidden md:flex items-center space-x-8 text-sm uppercase tracking-widest font-medium text-liquidSilver">
+                <div className="hidden md:flex items-center space-x-8 text-xs uppercase tracking-[0.2em] font-bold text-ashGrey">
                     {links.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={`relative group transition-all duration-200 ${pathname === link.href
+                            className={`relative group transition-colors duration-200 ${
+                                pathname === link.href
                                     ? "text-whiteChrome"
                                     : "hover:text-whiteChrome"
-                                }`}
+                            }`}
                         >
                             {link.label}
                             {pathname === link.href && (
                                 <motion.div
                                     layoutId="nav-indicator"
-                                    className="absolute -bottom-2 left-0 w-full h-[1px] bg-whiteChrome"
+                                    className="absolute -bottom-2 left-0 w-full h-[2px] bg-whiteChrome"
                                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                 />
                             )}
                         </Link>
                     ))}
 
+                    <div className="w-[1px] h-4 bg-whiteChrome/20" />
+
                     <ThemeToggle />
 
                     <Link
                         href="/quote"
-                        className="bg-whiteChrome text-matteCarbon px-6 py-3 font-bold uppercase tracking-widest text-xs hover:opacity-80 transition-all duration-200"
+                        className="bg-whiteChrome text-matteCarbon px-6 py-2.5 font-bold uppercase tracking-widest text-xs hover:bg-liquidSilver transition-all duration-300"
                     >
                         Get a Quote
                     </Link>
                 </div>
 
                 {/* Mobile controls */}
-                <div className="md:hidden flex items-center gap-3 z-[101] relative">
+                <div className="md:hidden flex items-center gap-4 z-[101] relative">
                     <ThemeToggle />
                     <button
                         className="text-whiteChrome"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         aria-label="Toggle menu"
                     >
-                        {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
             </div>
@@ -147,7 +151,7 @@ export function Navbar() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className="text-3xl font-heading font-bold text-whiteChrome hover:text-liquidSilver transition-all duration-200"
+                            className="text-2xl font-heading font-bold tracking-widest text-whiteChrome hover:text-ashGrey transition-all duration-200 uppercase"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             {link.label}

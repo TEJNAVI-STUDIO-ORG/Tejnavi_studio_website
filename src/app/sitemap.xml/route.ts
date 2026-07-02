@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { WORKFLOWS } from "@/data/workflows";
 import { db } from "@/lib/db";
-import { blogPosts } from "@/lib/db/schema";
+import { blogPosts, projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export const revalidate = 0; // Prevent Next.js from caching the sitemap so Google always gets fresh data
@@ -47,7 +47,25 @@ export async function GET() {
         console.error("Failed to fetch blogs for sitemap:", error);
     }
 
-    const allUrls = [...staticUrls, ...workflowUrls, ...dynamicBlogs];
+    // Build Dynamic Project Routes — one URL per project case study
+    let dynamicProjects: { url: string; lastmod: string; priority: number; changefreq: string }[] = [];
+    try {
+        const publishedProjects = await db
+            .select()
+            .from(projects)
+            .where(eq(projects.isPublished, true));
+
+        dynamicProjects = publishedProjects.map((p) => ({
+            url: `${baseUrl}/projects/${p.slug}`,
+            lastmod: new Date(p.updatedAt || p.createdAt).toISOString().split("T")[0],
+            changefreq: "monthly",
+            priority: 0.7,
+        }));
+    } catch (error) {
+        console.error("Failed to fetch projects for sitemap:", error);
+    }
+
+    const allUrls = [...staticUrls, ...workflowUrls, ...dynamicBlogs, ...dynamicProjects];
 
     // Generate strict XML string
     const xml = `<?xml version="1.0" encoding="UTF-8"?>

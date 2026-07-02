@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 
 export function ClientShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -22,6 +23,7 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
         <>
             {isAdminPage ? content : <SmoothScroll>{content}</SmoothScroll>}
             <Toaster />
+            <SonnerToaster position="top-right" richColors closeButton />
         </>
     );
 }

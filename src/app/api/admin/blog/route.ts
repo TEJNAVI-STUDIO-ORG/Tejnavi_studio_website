@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { z } from "zod";
+import { notifySearchEngines } from "@/lib/indexing";
 
 const blogSchema = z.object({
     title: z.string().min(1),
@@ -41,12 +43,26 @@ export async function POST(request: NextRequest) {
             publishedAt: data.publishedAt ? new Date(data.publishedAt) : data.isPublished ? new Date() : null,
         };
         const [created] = await db.insert(blogPosts).values(insertData).returning();
+
+        // Refresh public pages so the new post is picked up
+        revalidatePath("/blog");
+        revalidatePath(`/blog/${created.slug}`);
+        revalidatePath("/sitemap.xml");
+
+        // Notify search engines about the new URL (only if published)
+        if (created.isPublished) {
+            notifySearchEngines([`/blog/${created.slug}`, "/blog"]).catch(() => undefined);
+        }
+
         return NextResponse.json(created, { status: 201 });
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return NextResponse.json({ error: error.errors }, { status: 400 });
+            const first = error.errors[0];
+            const message = first ? `${first.path.join(".")}: ${first.message}` : "Validation failed";
+            return NextResponse.json({ error: message, details: error.errors }, { status: 400 });
         }
         console.error("Error:", error);
-        return NextResponse.json({ error: "Failed to create" }, { status: 500 });
+        const message = error instanceof Error ? error.message : "Failed to create";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Eye, EyeOff, Star } from "lucide-react";
+import { toast } from "sonner";
 
 interface Project {
     id: number;
@@ -63,53 +64,80 @@ export default function AdminProjects() {
         e.preventDefault();
         setSubmitting(true);
 
-        let imageUrl = form.imageUrl;
+        try {
+            let imageUrl = form.imageUrl;
 
-        // Upload image if new file selected
-        if (imageFile) {
-            const formData = new FormData();
-            formData.append("file", imageFile);
-            formData.append("folder", "tejnavi-studio/projects");
-            const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-            if (uploadRes.ok) {
+            // Upload image if new file selected
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append("file", imageFile);
+                formData.append("folder", "tejnavi-studio/projects");
+                const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+                if (!uploadRes.ok) {
+                    const err = await uploadRes.json().catch(() => ({}));
+                    throw new Error(err?.error || "Image upload failed");
+                }
                 const uploadData = await uploadRes.json();
                 imageUrl = uploadData.url;
             }
-        }
 
-        const payload = { ...form, imageUrl, slug: form.slug || form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") };
+            // Block submission if there's no image (schema requires it)
+            if (!editing && !imageUrl) {
+                throw new Error("Please upload a project image");
+            }
 
-        if (editing) {
-            await fetch(`/api/admin/projects/${editing.id}`, {
-                method: "PUT",
+            const payload = {
+                ...form,
+                imageUrl,
+                slug: form.slug || form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+            };
+
+            const url = editing ? `/api/admin/projects/${editing.id}` : "/api/admin/projects";
+            const method = editing ? "PUT" : "POST";
+            const res = await fetch(url, {
+                method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
-        } else {
-            await fetch("/api/admin/projects", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-        }
 
-        setSubmitting(false);
-        setShowForm(false);
-        fetchProjects();
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err?.error || `Request failed (${res.status})`);
+            }
+
+            toast.success(editing ? "Project updated" : "Project created");
+            setShowForm(false);
+            fetchProjects();
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast.error(message);
+            console.error("Project save failed:", error);
+        } finally {
+            setSubmitting(false);
+        }
     }
 
     async function handleDelete(id: number) {
         if (!confirm("Are you sure you want to delete this project?")) return;
-        await fetch(`/api/admin/projects/${id}`, { method: "DELETE" });
+        const res = await fetch(`/api/admin/projects/${id}`, { method: "DELETE" });
+        if (!res.ok) {
+            toast.error("Failed to delete project");
+            return;
+        }
+        toast.success("Project deleted");
         fetchProjects();
     }
 
     async function togglePublish(project: Project) {
-        await fetch(`/api/admin/projects/${project.id}`, {
+        const res = await fetch(`/api/admin/projects/${project.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ isPublished: !project.isPublished }),
         });
+        if (!res.ok) {
+            toast.error("Failed to update status");
+            return;
+        }
         fetchProjects();
     }
 

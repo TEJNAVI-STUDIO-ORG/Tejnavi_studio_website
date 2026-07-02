@@ -71,6 +71,7 @@ export default function RootLayout({
             suppressHydrationWarning
         >
             <body className="selection:bg-whiteChrome selection:text-matteCarbon">
+                <div className="noise-overlay" />
                 <Providers>
                     <ClientShell>{children}</ClientShell>
                 </Providers>
